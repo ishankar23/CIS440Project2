@@ -5,6 +5,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Goal Manager</title>
+    <!-- DATABASE CONNECTION DON'T TOUCH -->
+    <script type="module">
+        console.log("STARTING DB CONNECTION");
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.9/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB9PV7cvxg6wblks33WezXvmHkUbo9cPno",
+            authDomain: "goal-master-93ae0.firebaseapp.com",
+            projectId: "goal-master-93ae0",
+            storageBucket: "goal-master-93ae0.appspot.com",
+            messagingSenderId: "793578125991",
+            appId: "1:793578125991:web:34e09bfa84476011db7982"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        console.log("INITIALIZED FIREBASE");
+    </script>
+
+    
+    <!-- Database connection: Firebase is basically MongoDB, the following code is copied from Firebase-->
 </head>
 <body>
     
