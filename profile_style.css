@@ -1,0 +1,45 @@
+* {
+    font-family: 'Raleway', sans-serif;
+}
+table {
+    width: 400px; 
+    margin-left: auto; 
+    margin-right: auto; 
+    border: solid gray 1px;
+    border-radius: 5px; 
+    
+} 
+
+.center {
+    
+    margin: auto; 
+}
+
+img {
+    display: block; 
+    margin: auto; 
+}
+.attribute {
+    padding: 5px; 
+}
+
+th {
+    font-size: 40px; ;
+}
+td {
+    text-align: center; 
+    width: 33%
+}
+
+tr td p {
+    padding: 5px; 
+    text-align: left; ;
+}
+/* h1 {
+    margin: auto; 
+}
+
+img {
+    margin: auto; 
+    
+}  */
