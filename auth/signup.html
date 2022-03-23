@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="./style.css"> -->
+    <title>Home</title>
+    <!-- DATABASE CONNECTION DON'T TOUCH -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+    console.log("STARTING DB CONNECTION");
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyB9PV7cvxg6wblks33WezXvmHkUbo9cPno",
+        authDomain: "goal-master-93ae0.firebaseapp.com",
+        projectId: "goal-master-93ae0",
+        storageBucket: "goal-master-93ae0.appspot.com",
+        messagingSenderId: "793578125991",
+        appId: "1:793578125991:web:34e09bfa84476011db7982"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    console.log("INITIALIZED FIREBASE");
+
+    const db = app.firestore();
+
+    // Create the User Sign Up Function
+    function userSignUp(email, password, firstName, lastName){
+        app.auth().createUserWithEmailAndPassword(email, password)
+        .then((UserCreds) => {
+            console.log(UserCreds);
+            db.collection("user_info").doc(UserCreds.user.uid).set({
+                firstName: firstName,
+                lastName: lastName,
+                role: 'Mentee'
+            })
+            .then(() => {
+                console.log("USER ACCOUNT CREATED")
+                window.location.href = "../app/index.html"
+            })
+        })
+        .catch((error) => {
+            console.error(error);
+            errPgrph = document.getElementById('error');
+            errPgrph.innerHTML = error.message;
+        })
+    }
+        
+    </script>
+
+</head>   
+<body>
+
+      <main id="mainHolder">
+        <button id="login" onclick="window.location.href = './login.html'">Login</button>
+        <h1 id="login-header">Create an Account</h1>
+        <hr>
+        
+        <p id="error"></p>
+
+        <b>User Details</b><br>
+        <input type='text' name='firstName' id='firstName' class='loginFormField' placeholder="First Name"><br>
+        <input type='text' name='lastName' id='lastName' class='loginFormField' placeholder="Last Name"><br><br>
+        <b>Login Details</b><br>
+        <input type="email" name="email" id="emailField" class="loginFormField" pattern="[a-z0-9.-_]+@[a-z]+\.[a-z]{2,3}" placeholder="E-Mail"><br>
+        <input type="password" name="password" id="password" class="loginFormField" placeholder="Password"><br><br>
+        <button id="submit" onclick="userSignUp(document.getElementById('emailField').value, document.getElementById('password').value, document.getElementById('firstName').value, document.getElementById('lastName').value)">Sign Up</button>
+      
+      </main>
+
+</body>
+</html>

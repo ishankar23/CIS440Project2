@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style.css">
+    <title>Master Goal Manager</title>
+    <!-- DATABASE CONNECTION DON'T TOUCH -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script>
+        console.log("STARTING DB CONNECTION");
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB9PV7cvxg6wblks33WezXvmHkUbo9cPno",
+            authDomain: "goal-master-93ae0.firebaseapp.com",
+            projectId: "goal-master-93ae0",
+            storageBucket: "goal-master-93ae0.appspot.com",
+            messagingSenderId: "793578125991",
+            appId: "1:793578125991:web:34e09bfa84476011db7982"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        console.log("INITIALIZED FIREBASE");
+
+        var db = app.firestore();
+
+        app.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in, see docs for a list of available properties
+                // https://firebase.google.com/docs/reference/js/firebase.User
+                console.log("USER SIGNED IN AS : " + user.uid);
+                console.log(user);
+                // ...
+            } else {
+                console.log("USER IS SIGNED OUT, REDIRECTING TO LOGIN PAGE...");
+                window.location.href = "../auth/login.html"
+                // User is signed out
+                // ...
+            }
+        });
+
+        function signOut(){
+            firebase.auth().signOut()
+            .then(() => {
+                console.log("User Signed-Out")
+                window.location.href = "../auth/login.html"
+            })
+        }
+        
+        // Add goal 
+        function addAGoal(addGoal, addMeasure, addAttainable, addRelevant, addTime) {
+            console.log("ADDING GOAL");
+            db.collection("goals").add({
+                goal: addGoal,
+                measure: addMeasure,
+                attainable: addAttainable,
+                relevant: addRelevant,
+                time: addTime
+                
+            })
+         
+            .then((docRef) => {
+                console.log("Document written with ID: ", docRef.id);
+                document.getElementById('goal').value = null;
+                document.getElementById('measure').value = null;
+                document.getElementById('attainable').value = null;
+                document.getElementById('relevant').value = null;
+                document.getElementById('time').value = null;
+                console.log('added to database');
+            })
+            .catch((error) => {
+                console.error("Error adding document: " + error);
+                // let errorMsgDisplay = document.getElementById("errorMsg");
+                // let errorMsgText = document.createTextNode("Error Adding Review. See Console for More Details.");
+                // errorMsgDisplay.appendChild(errorMsgText);
+            });
+
+            
+        }
+    </script>
+
+    
+    <!-- Database connection: Firebase is basically MongoDB, the following code is copied from Firebase-->
+</head>
+<body>
+    <div>
+        <button id="signout" onclick="signOut()">Sign Out</button>
+    </div>
+    <div id="title">
+        <h1>Master Goal Manager</h1>
+    </div>
+    <div>
+        <label for="goal">Specific Goal: </label>
+        <input type="text" name="goal" id="goal">
+        <br><label for="measure">Measure</label>
+        <input type="text" name="measure" id="measure">
+        <br><label for="attainable">Attainable</label>
+        <input type="text" name="attainable" id="attainable">
+        <label for="relevant">Relevant</label>
+        <input type="text" name="relevant" id="relevant">
+        <label for="time">Time Bound</label>
+        <input type="date" name="time" id="time">
+        <br><br><button type="button" name="addGoalButton" 
+        id="addGoalButton" onclick="addAGoal(document.getElementById('goal').value, 
+        document.getElementById('measure').value, document.getElementById('attainable').value, document.getElementById('relevant').value,
+        document.getElementById('time').value)">Add Goal</button>
+    </div>
+</body>
+</html>
