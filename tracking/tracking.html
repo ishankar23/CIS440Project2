@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Home</title>
+    <!-- DATABASE CONNECTION DON'T TOUCH -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+</head>  
+<body>
+
+  <h1 id="mentee-header">My Mentees</h1>
+  <div>
+      <ul id="menteeList">
+          
+      </ul>
+  </div>
+  <button><a href="../app/">Profile</a></button>
+      
+
+</body>
+<script>
+    console.log("STARTING DB CONNECTION");
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyB9PV7cvxg6wblks33WezXvmHkUbo9cPno",
+        authDomain: "goal-master-93ae0.firebaseapp.com",
+        projectId: "goal-master-93ae0",
+        storageBucket: "goal-master-93ae0.appspot.com",
+        messagingSenderId: "793578125991",
+        appId: "1:793578125991:web:34e09bfa84476011db7982"
+    };
+    //Initating Database Connection -- DO NOT REMOVE
+    const app = firebase.initializeApp(firebaseConfig);
+    var database = firebase.firestore(app);
+
+    function loadList(){
+        database.collection("user_info").get().then((querySnapshot) =>
+        {
+            querySnapshot.forEach((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+            console.log(doc.id, " => ", doc.data());
+            console.log(doc.data().firstName);
+            if (doc.data().firstName.length !== 0 || doc.data().lastName.length !== 0) {
+                var ul = document.getElementById("menteeList");
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(doc.data().firstName + " " + doc.data().lastName));
+                ul.appendChild(li)
+            }
+        });
+        });
+    }
+    loadList()
+
+
+    //***Waiting for Authentication in order to Implement Full***
+    // Initialize Firebase
+    // console.log("INITIALIZED FIREBASE");
+
+    // function userSignIn(email, password){
+    //   app.auth().signInWithEmailAndPassword(email, password)
+    //   .then((userCredential) => {
+    //       // Signed in
+    //       console.log("Sign In Success!");
+    //       window.location.href="../app/profile.html"
+    //   })
+    //   .catch((error) => {
+    //     errPgrph = document.getElementById('error');
+    //     errPgrph.innerHTML = error.message;
+    //   })
+    // }
+
+    // Function to GET list of all Mentors Mentees
+    </script>
+</html>
