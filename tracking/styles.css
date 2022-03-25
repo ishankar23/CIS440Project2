@@ -1,3 +1,23 @@
-ul {
-    list-style: none;
+ul
+{
+    list-style: disc inside;
+    list-style-position: outside;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    margin: auto;
+}
+
+html
+{
+    height: 100%;
+}
+
+button
+{
+    background:  #FFC627;
+    border: 0;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 12px 12px;
+    margin-top: 12px;
+    font-weight: bold;
 }

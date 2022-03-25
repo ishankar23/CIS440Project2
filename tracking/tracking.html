@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./styles.css">
-    <title>Home</title>
+    <title>Mentee List</title>
     <!-- DATABASE CONNECTION DON'T TOUCH -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -16,13 +16,10 @@
 
   <h1 id="mentee-header">My Mentees</h1>
   <div>
-      <ul id="menteeList">
-          
-      </ul>
+      <ul id="menteeList"></ul>
   </div>
-  <button><a href="../app/">Profile</a></button>
+  <button><a href="../app/">Back to My Profile</a></button>
       
-
 </body>
 <script>
     console.log("STARTING DB CONNECTION");
@@ -60,7 +57,6 @@
     }
     loadList()
 
-
     //***Waiting for Authentication in order to Implement Full***
     // Initialize Firebase
     // console.log("INITIALIZED FIREBASE");
@@ -77,7 +73,5 @@
     //     errPgrph.innerHTML = error.message;
     //   })
     // }
-
-    // Function to GET list of all Mentors Mentees
     </script>
 </html>
