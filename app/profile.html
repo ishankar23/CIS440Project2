@@ -8,20 +8,29 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400&display=swap" rel="stylesheet">
+
+<!-- DATABASE CONNECTION DON'T TOUCH -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+
+
+
 </head>
 
 
 <body>
 <div class="center">
 
-<table class="center">
+<table id="contactInfo" class="center">
   
-    <th class="center" colspan="3">Jane Doe</th>
+    <th class="center" id="mentorName" colspan="3"></th>
     <tr>
         <address>
-        <td class="attribute"><a href="tel:1234567890"><img src="https://img.icons8.com/ios-filled/30/000000/phone.png"/></a></td>
-        <td class="attribute"><a href="mailto:janedoe@gmail.com"><img src="https://img.icons8.com/material-rounded/30/000000/new-post.png"/></a></td>
-        <td class="attribute"><a href="https://www.linkedin.com/"><img src="https://img.icons8.com/ios-glyphs/30/000000/linkedin.png"/></a></td>
+        <td class="attribute"><a id="phoneNumber" href="tel:1234567890"><img src="https://img.icons8.com/ios-filled/30/000000/phone.png"/></a></td>
+        <td class="attribute"><a id="linkedEmail" href="mailto:janedoe@gmail.com"><img src="https://img.icons8.com/material-rounded/30/000000/new-post.png"/></a></td>
+        <td class="attribute"><a id="profileLink" href="https://www.linkedin.com/"><img src="https://img.icons8.com/ios-glyphs/30/000000/linkedin.png"/></a></td>
         </address>
     </tr>
 
@@ -52,8 +61,71 @@
 
 </body>
 
+<script>
+    
 
+
+    console.log("STARTING DB CONNECTION");
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+    
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyB9PV7cvxg6wblks33WezXvmHkUbo9cPno",
+        authDomain: "goal-master-93ae0.firebaseapp.com",
+        projectId: "goal-master-93ae0",
+        storageBucket: "goal-master-93ae0.appspot.com",
+        messagingSenderId: "793578125991",
+        appId: "1:793578125991:web:34e09bfa84476011db7982"
+    };
+    
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    
+    console.log("INITIALIZED FIREBASE");
+    
+    
+    
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        
+        var uid = user.uid;
+        var userEmail = user.email; 
+        console.log(uid); 
+        console.log(userEmail); 
+    
+    
+        db.collection("user_info").get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                 
+                if (doc.get("email") == userEmail) {
+                    fName = doc.get("firstName"); 
+                    lName = doc.get("lastName");
+                    role = doc.get("role");
+                    phoneNumber = doc.get("phone");
+                    profileLink = doc.get("profile"); 
+                    document.getElementById("mentorName").innerHTML=fName +" "+lName;
+                    document.getElementById("phoneNumber").href="tel:" + phoneNumber; 
+                    document.getElementById("linkedEmail").href="mailto:" + userEmail; 
+                    document.getElementById("profileLink").href=profileLink; 
+                     
+                }
+            
+        });
+    
+        }); 
+    
+    
+      } else {
+        // User is signed out
+        // ...
+      }
+    });
+    
+    
+        
+    </script>
 
 
 </html>
-
