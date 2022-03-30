@@ -20,7 +20,7 @@ label {
 }
 
 input {
-    width: 75%;
+    width: 100%;
 }
 
 button {
@@ -75,4 +75,14 @@ body {
 
 .loginFormField {
   padding: 0px 0px 5px 5px;
+}
+
+#userName {
+  margin-left: 7rem;
+  margin-bottom: 0.5rem;
+}
+
+#userEmail {
+  margin-top: 0rem;
+  margin-left: 7rem;
 }
