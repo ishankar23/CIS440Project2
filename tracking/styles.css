@@ -1,3 +1,18 @@
-ul {
-    list-style: none;
+*
+{
+    font-family: 'Raleway', sans-serif;
+}
+
+ul
+{
+    list-style-type: square;
+}
+
+button
+{
+    width: 175px;
+    height: 30px; 
+    font-size: 18px; 
+    border-radius: 5px; 
+    border: solid gray 1px; 
 }
