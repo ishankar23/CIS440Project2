@@ -36,15 +36,67 @@
                 // User is signed in, see docs for a list of available properties
                 // https://firebase.google.com/docs/reference/js/firebase.User
                 console.log("USER SIGNED IN AS : " + user.uid);
-                console.log(user);
-                // ...
-            } else {
+
+                var userEmail = user.email;
+                console.log(userEmail);
+                
+                db.collection("user_info").get().then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        if (doc.get("email") == userEmail) {
+                            fName = doc.get("firstName"); 
+                            lName = doc.get("lastName");
+                            document.getElementById("userName").innerHTML = fName + " " + lName;
+                            eMail = doc.get("email")
+                            document.getElementById("userEmail").innerHTML = eMail
+                        }
+                    })
+                })
+            } //end if statement for user sign in 
+            else {
                 console.log("USER IS SIGNED OUT, REDIRECTING TO LOGIN PAGE...");
                 window.location.href = "../auth/login.html"
                 // User is signed out
                 // ...
             }
+
         });
+
+    
+        //Add goal 
+        function addAGoal(addGoal, addMeasure, addAttainable, addRelevant, addTime) {
+            console.log("ADDING GOAL");
+
+            app.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    console.log("For: " + user.email)
+                    db.collection("goals").add({
+                        goal: addGoal,
+                        measure: addMeasure,
+                        attainable: addAttainable,
+                        relevant: addRelevant,
+                        time: addTime,
+                        username: user.email
+                    })
+        
+                    .then((docRef) => {
+                        console.log("Document written with ID: ", docRef.id);
+                        document.getElementById('goal').value = null;
+                        document.getElementById('measure').value = null;
+                        document.getElementById('attainable').value = null;
+                        document.getElementById('relevant').value = null;
+                        document.getElementById('time').value = null;
+                        console.log('added to database');
+                    })
+                    .catch((error) => {
+                        console.error("Error adding document: " + error);
+                        // let errorMsgDisplay = document.getElementById("errorMsg");
+                        // let errorMsgText = document.createTextNode("Error Adding Review. See Console for More Details.");
+                        // errorMsgDisplay.appendChild(errorMsgText);
+                    });
+                }
+            });
+            
+        }
 
         function signOut(){
             firebase.auth().signOut()
@@ -53,39 +105,8 @@
                 window.location.href = "../auth/login.html"
             })
         }
-        
-        // Add goal 
-        function addAGoal(addGoal, addMeasure, addAttainable, addRelevant, addTime) {
-            console.log("ADDING GOAL");
-            db.collection("goals").add({
-                goal: addGoal,
-                measure: addMeasure,
-                attainable: addAttainable,
-                relevant: addRelevant,
-                time: addTime
-                
-            })
-         
-            .then((docRef) => {
-                console.log("Document written with ID: ", docRef.id);
-                document.getElementById('goal').value = null;
-                document.getElementById('measure').value = null;
-                document.getElementById('attainable').value = null;
-                document.getElementById('relevant').value = null;
-                document.getElementById('time').value = null;
-                console.log('added to database');
-            })
-            .catch((error) => {
-                console.error("Error adding document: " + error);
-                // let errorMsgDisplay = document.getElementById("errorMsg");
-                // let errorMsgText = document.createTextNode("Error Adding Review. See Console for More Details.");
-                // errorMsgDisplay.appendChild(errorMsgText);
-            });
 
-            
-        }
     </script>
-
     
     <!-- Database connection: Firebase is basically MongoDB, the following code is copied from Firebase-->
 </head>
@@ -95,7 +116,13 @@
     </div>
     <div id="title">
         <h1>Master Goal Manager</h1>
+        <h2><a href="./profile.html" id="userName"></a></h2>
+        <h6 id="userEmail"></h6>
     </div>
+    <!-- <div>
+        <label for="smart">SMART Goals</label>
+        <input type="radio" id="smart">
+    </div> -->
     <div>
         <label for="goal">Specific Goal: </label>
         <input type="text" name="goal" id="goal">
