@@ -44,11 +44,12 @@ firebase.auth().onAuthStateChanged((user) => {
         var userEmail = user.email; 
         console.log(uid); 
         console.log(userEmail);
-
+        document.getElementById("goalButton").style.visibility = "hidden"; 
+        document.getElementById("menteeButton").style.visibility = "hidden";
 
         db.collection("user_info").get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {    
-                if (doc.get("email") == userEmail) {
+                if (doc.get("email") == userEmail && doc.get("role") == "Mentor") {
                     fName = doc.get("firstName"); 
                     lName = doc.get("lastName");
                     role = doc.get("role");
@@ -58,8 +59,24 @@ firebase.auth().onAuthStateChanged((user) => {
                     document.getElementById("mentorName").innerHTML=fName +" "+lName;
                     document.getElementById("phoneNumber").href="tel:" + phoneNumber; 
                     document.getElementById("linkedEmail").href="mailto:" + userEmail; 
-                    document.getElementById("profileLink").href=profileLink;  
+                    document.getElementById("profileLink").href=profileLink;
+                    document.getElementById("menteeButton").style.visibility = "visible";
                 }
+              
+                if (doc.get("email") == userEmail && doc.get("role") == "Mentee") {
+                    fName = doc.get("firstName"); 
+                    lName = doc.get("lastName");
+                    role = doc.get("role");
+                    phoneNumber = doc.get("phone");
+                    profileLink = doc.get("profile"); 
+                    document.getElementById("mentorName").innerHTML=fName +" "+lName;
+                    document.getElementById("phoneNumber").href="tel:" + phoneNumber; 
+                    document.getElementById("linkedEmail").href="mailto:" + userEmail; 
+                    document.getElementById("profileLink").href=profileLink;
+                    document.getElementById("goalButton").style.visibility = "visible";
+                     
+                }
+                
             });
         }); 
     }
@@ -314,13 +331,13 @@ db.collection("goals").get().then((querySnapshot) => {
         </address>
     </tr>
 
-    <tr class="center">
+    <tr class="center" id="goalButton">
         <td colspan="3">
             <button><a href="./index.html">Add Goals</a></button>
         </td>
     </tr>
         <!-- TO DO: Profile page needs to be role aware to show & hide My Mentees Button -->
-    <tr>
+    <tr id="menteeButton">
         <td colspan="3">
             <button><a href="../tracking/tracking.html">My Mentees</a></button>
         </td>
@@ -395,7 +412,6 @@ db.collection("goals").get().then((querySnapshot) => {
 
 
 </body>
-
 
 
 </html>
