@@ -14,6 +14,285 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
+<script>
+console.log("STARTING DB CONNECTION");
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyB9PV7cvxg6wblks33WezXvmHkUbo9cPno",
+    authDomain: "goal-master-93ae0.firebaseapp.com",
+    projectId: "goal-master-93ae0",
+    storageBucket: "goal-master-93ae0.appspot.com",
+    messagingSenderId: "793578125991",
+    appId: "1:793578125991:web:34e09bfa84476011db7982"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+console.log("INITIALIZED FIREBASE");
+
+let parent = this;
+let userRole = null;
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+    
+        var uid = user.uid;
+        var userEmail = user.email; 
+        console.log(uid); 
+        console.log(userEmail);
+        document.getElementById("goalButton").style.visibility = "hidden"; 
+        document.getElementById("menteeButton").style.visibility = "hidden";
+
+        db.collection("user_info").get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {    
+                if (doc.get("email") == userEmail && doc.get("role") == "Mentor") {
+                    fName = doc.get("firstName"); 
+                    lName = doc.get("lastName");
+                    role = doc.get("role");
+                    parent.userRole = role;
+                    phoneNumber = doc.get("phone");
+                    profileLink = doc.get("profile"); 
+                    document.getElementById("mentorName").innerHTML=fName +" "+lName;
+                    document.getElementById("phoneNumber").href="tel:" + phoneNumber; 
+                    document.getElementById("linkedEmail").href="mailto:" + userEmail; 
+                    document.getElementById("profileLink").href=profileLink;
+                    document.getElementById("menteeButton").style.visibility = "visible";
+                }
+              
+                if (doc.get("email") == userEmail && doc.get("role") == "Mentee") {
+                    fName = doc.get("firstName"); 
+                    lName = doc.get("lastName");
+                    role = doc.get("role");
+                    phoneNumber = doc.get("phone");
+                    profileLink = doc.get("profile"); 
+                    document.getElementById("mentorName").innerHTML=fName +" "+lName;
+                    document.getElementById("phoneNumber").href="tel:" + phoneNumber; 
+                    document.getElementById("linkedEmail").href="mailto:" + userEmail; 
+                    document.getElementById("profileLink").href=profileLink;
+                    document.getElementById("goalButton").style.visibility = "visible";
+                     
+                }
+                
+            });
+        }); 
+    }
+    else {
+        console.log("USER IS SIGNED OUT, REDIRECTING TO LOGIN PAGE...");
+        window.location.href = "../auth/login.html"
+        // User is signed out
+        // ...
+    }
+});
+
+function addSubGoal(subGoalText, goalId){
+    // Construct the subgoal dictionary
+    let subGoal = {
+        label: subGoalText,
+        selected: false
+    }
+
+    let goalDocument = db.collection("goals").doc(goalId);
+
+    // Check if there is an existing array for sub-goals
+    goalDocument.get().then((doc) => {
+        let subGoalArray = null;
+        subGoalArray = doc.data().subgoals;
+    
+        console.log(subGoalArray);
+        if(!subGoalArray){
+            // If no, create a new array in the document. 
+            subGoalArray = [];
+        }
+        console.log(subGoalArray);
+        // Append the subgoal to the new array and leave the goal unchecked.
+        subGoalArray.push(subGoal);
+
+        // Update the subGoalArray in the DB
+        goalDocument.update({
+            subgoals: subGoalArray
+        })
+        .then(() => {
+            location.reload();
+        })
+    });
+
+    
+}
+
+function flipCheck(goalidFC, subgoalnumber){
+    console.log("FLIP CHECK")
+    console.log("----------")
+    console.log("GOAL ID: " + goalidFC);
+    console.log("SUB-GOAL NUMBER: " + subgoalnumber);
+    console.log("--------------------")
+    let goalDocument = db.collection("goals").doc(goalidFC);
+
+    // Check if there is an existing array for sub-goals
+    goalDocument.get().then((doc) => {
+        let subGoalArray = null;
+        subGoalArray = doc.data().subgoals;
+    
+        console.log(subGoalArray);
+        subGoalArray[subgoalnumber].selected = !subGoalArray[subgoalnumber].selected;
+        console.log(subGoalArray);
+
+        // Update the subGoalArray in the DB
+        goalDocument.update({
+            subgoals: subGoalArray
+        })
+        .then(() => {
+            location.reload();
+        })
+    });
+
+    
+}
+
+db.collection("goals").get().then((querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+        console.log("GOAL RECORD")
+        console.log("------------")
+        goalId = doc.id;
+        console.log("DOC ID: " + goalId);
+        goal = doc.get("goal")
+        console.log("GOAL NAME: " + goal);
+        measure = doc.get("measure"); 
+        console.log("MEASURE: " + measure);
+        relevant = doc.get("relevant");
+        console.log('RELEVANT: ' + relevant);
+        timeBound = doc.get("time");
+        console.log('TIME-BOUND: ' + timeBound);
+        attainable = doc.get("attainable");
+        console.log("ATTAINABLE: " + attainable);
+        subgoals = doc.get("subgoals");
+        console.log("SUB-GOALS: " + subgoals);
+        console.log("------------------------")
+
+        let goalsContainer = document.getElementById("goalCards");
+
+        let column = document.createElement('div');
+        column.setAttribute('class', 'column');
+
+        let card = document.createElement('div');
+        card.setAttribute('class', 'card');
+        let cardHeader = document.createTextNode(goal);
+        card.appendChild(cardHeader);
+
+        let measurePrgh = document.createElement('p');
+        // bolding the label
+        let measureLabel = document.createElement('b');
+        let measureLabelTxt = document.createTextNode('Measure: ')
+        measureLabel.appendChild(measureLabelTxt);
+        measurePrgh.appendChild(measureLabel);
+        let measureContentTxt = document.createTextNode(measure);
+        measurePrgh.appendChild(measureContentTxt);
+        card.appendChild(measurePrgh);
+
+        // attainable
+        let attainablePrgh = document.createElement('p');
+        // bolding the label
+        let attainableLabel = document.createElement('b');
+        let attainableLabelTxt = document.createTextNode('Attainable: ')
+        attainableLabel.appendChild(attainableLabelTxt);
+        attainablePrgh.appendChild(attainableLabel);
+        let attainableContentTxt = document.createTextNode(attainable);
+        attainablePrgh.appendChild(attainableContentTxt);
+        card.appendChild(attainablePrgh);
+
+        
+        // relevant
+        let relevantPrgh = document.createElement('p');
+        // bolding the label
+        let relevantLabel = document.createElement('b');
+        let relevantLabelTxt = document.createTextNode('Relevant: ')
+        relevantLabel.appendChild(relevantLabelTxt);
+        relevantPrgh.appendChild(relevantLabel);
+        let relevantContentTxt = document.createTextNode(relevant);
+        relevantPrgh.appendChild(relevantContentTxt);
+        card.appendChild(relevantPrgh);
+
+        
+        // time bound
+        let timeBoundPrgh = document.createElement('p');
+        // bolding the label
+        let timeBoundLabel = document.createElement('b');
+        let timeBoundLabelTxt = document.createTextNode('Time Bound: ')
+        timeBoundLabel.appendChild(timeBoundLabelTxt);
+        timeBoundPrgh.appendChild(timeBoundLabel);
+        let timeBoundContentTxt = document.createTextNode(timeBound);
+        timeBoundPrgh.appendChild(timeBoundContentTxt);
+        card.appendChild(timeBoundPrgh);
+
+        let horizontalRuler = document.createElement('hr');
+        card.appendChild(horizontalRuler);
+
+        // checkbox part of the goal cards
+        let fieldset = document.createElement('fieldset');
+        fieldset.setAttribute('class', 'checkboxgroup')
+
+        // pull out the array for subgoals (checkboxes) and cycle through to print each one
+        if(subgoals){
+            let subGoalCounter = 0;
+            for (const subgoal of subgoals) {
+                let input = document.createElement('input');
+                input.setAttribute('type','checkbox');
+                input.setAttribute('name', 'subGoal' + subGoalCounter);
+                input.setAttribute('onclick', 'flipCheck("' + goalId + '", ' + subGoalCounter + ');')
+                // to ensure that admins cannot check the box 
+                input.disabled = (parent.userRole == "mentor");
+                // for checkbox status based on true/false in db
+                input.checked = subgoal.selected;
+                fieldset.appendChild(input);
+
+                let inputLabel = document.createElement('label');
+                inputLabel.setAttribute('for', 'subGoal' + subGoalCounter);
+                let inputLabelTxt = document.createTextNode(subgoal.label);
+                inputLabel.appendChild(inputLabelTxt);
+                fieldset.appendChild(inputLabel);
+                
+                let lineBreak1 = document.createElement('br');
+                fieldset.appendChild(lineBreak1);
+
+                let lineBreak2 = document.createElement('br');
+                fieldset.appendChild(lineBreak2);
+                subGoalCounter = subGoalCounter + 1;
+            }
+        }
+        let subGoalAddinput = document.createElement('input');
+        subGoalAddinput.setAttribute('id', goalId);
+        subGoalAddinput.setAttribute('type','text');
+        subGoalAddinput.setAttribute('placeholder', 'Enter Sub-Goal');
+        fieldset.appendChild(subGoalAddinput);
+
+        let subGoalAddinputButton = document.createElement('button');
+        subGoalAddinputButton.style = "width:fit-content";
+        subGoalAddinputButton.setAttribute('onclick', 'addSubGoal(document.getElementById("' + goalId + '").value, "' + goalId + '");')
+        let subGoalAddinputButtonTxt = document.createTextNode("+");
+        subGoalAddinputButton.appendChild(subGoalAddinputButtonTxt);
+        fieldset.appendChild(subGoalAddinputButton);
+
+        
+
+        card.appendChild(fieldset);
+
+        column.appendChild(card);
+        goalsContainer.appendChild(column);
+    });
+});
+   
+
+
+
+
+    
+    
+        
+    </script>
+
 
 
 
@@ -37,7 +316,7 @@
 
     <tr class="center" id="goalButton">
         <td colspan="3">
-            <button><a href="./index.html">My Goals</a></button>
+            <button><a href="./index.html">Add Goals</a></button>
         </td>
     </tr>
         <!-- TO DO: Profile page needs to be role aware to show & hide My Mentees Button -->
@@ -58,91 +337,63 @@
    
 </table>
 </div>
+<br>
+<br>
+<br>
+<div id="goalCards" class="row">
+</div>
+
+<!-- <div class="row">
+    <div class="column">
+        <div class="card">Goal
+        <p><b>Measure : </b> Test</p>
+        <p><b>Measure : </b> Test</p>
+        <p><b>Measure : </b> Test</p>
+        <p><b>Measure : </b> Test</p>
+        <hr>
+        <fieldset class="checkboxgroup">
+            <label><input type="checkbox" id="goal"> checkbox 1</label><br><br>
+            <label><input type="checkbox"> checkbox 2</label><br><br>
+            <label><input type="checkbox"> checkbox 3</label><br><br>
+            <label><input type="checkbox"> checkbox 4</label><br><br>
+        </fieldset>
+    </div>
+</div>
+    <div class="column">
+      <div class="card">Goal</div>
+        <fieldset class="checkboxgroup">
+        
+            <label><input type="checkbox"> checkbox 1</label><br><br>
+            <label><input type="checkbox"> checkbox 2</label><br><br>
+            <label><input type="checkbox"> checkbox 3</label><br><br>
+            <label><input type="checkbox"> checkbox 4</label><br><br>
+        </fieldset>
+    </div>
+    <div class="column">
+      <div class="card">Goal</div>
+         <fieldset class="checkboxgroup">
+            
+            <label><input type="checkbox"> checkbox 1</label><br><br>
+            <label><input type="checkbox"> checkbox 2</label><br><br>
+            <label><input type="checkbox"> checkbox 3</label><br><br>
+            <label><input type="checkbox"> checkbox 4</label><br><br>
+        </fieldset>
+    </div>
+    <div class="column">
+      <div class="card">Goal</div>
+        <fieldset class="checkboxgroup">
+       
+            <label><input type="checkbox"> checkbox 1</label><br><br>
+            <label><input type="checkbox"> checkbox 2</label><br><br>
+            <label><input type="checkbox"> checkbox 3</label><br><br>
+            <label><input type="checkbox"> checkbox 4</label><br><br>
+        </fieldset>
+    </div>
+  </div> -->
+
 
 
 </body>
-
-<script>
-    
-
-
-    console.log("STARTING DB CONNECTION");
-    // TODO: Add SDKs for Firebase products that you want to use
-    // https://firebase.google.com/docs/web/setup#available-libraries
-    
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyB9PV7cvxg6wblks33WezXvmHkUbo9cPno",
-        authDomain: "goal-master-93ae0.firebaseapp.com",
-        projectId: "goal-master-93ae0",
-        storageBucket: "goal-master-93ae0.appspot.com",
-        messagingSenderId: "793578125991",
-        appId: "1:793578125991:web:34e09bfa84476011db7982"
-    };
-    
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    
-    console.log("INITIALIZED FIREBASE");
-    
-    
-    
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        
-        var uid = user.uid;
-        var userEmail = user.email; 
-        console.log(uid); 
-        console.log(userEmail); 
-        document.getElementById("goalButton").style.visibility = "hidden"; 
-        document.getElementById("menteeButton").style.visibility = "hidden";
-
-        db.collection("user_info").get().then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                 
-                if (doc.get("email") == userEmail && doc.get("role") == "Mentor") {
-                    fName = doc.get("firstName"); 
-                    lName = doc.get("lastName");
-                    role = doc.get("role");
-                    phoneNumber = doc.get("phone");
-                    profileLink = doc.get("profile"); 
-                    document.getElementById("mentorName").innerHTML=fName +" "+lName;
-                    document.getElementById("phoneNumber").href="tel:" + phoneNumber; 
-                    document.getElementById("linkedEmail").href="mailto:" + userEmail; 
-                    document.getElementById("profileLink").href=profileLink; 
-                    document.getElementById("menteeButton").style.visibility = "visible"; 
-                     
-                }
-
-                if (doc.get("email") == userEmail && doc.get("role") == "Mentee") {
-                    fName = doc.get("firstName"); 
-                    lName = doc.get("lastName");
-                    role = doc.get("role");
-                    phoneNumber = doc.get("phone");
-                    profileLink = doc.get("profile"); 
-                    document.getElementById("mentorName").innerHTML=fName +" "+lName;
-                    document.getElementById("phoneNumber").href="tel:" + phoneNumber; 
-                    document.getElementById("linkedEmail").href="mailto:" + userEmail; 
-                    document.getElementById("profileLink").href=profileLink;
-                    document.getElementById("goalButton").style.visibility = "visible";
-                     
-                }
-            
-        });
-    
-        }); 
-    
-    
-      } else {
-        // User is signed out
-        // ...
-      }
-    });
-    
-    
-        
-    </script>
 
 
 </html>
