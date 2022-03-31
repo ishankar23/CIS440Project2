@@ -62,6 +62,143 @@ firebase.auth().onAuthStateChanged((user) => {
                 }
             });
         }); 
+
+        let userDocument = db.collection("user_info").doc(user.uid);
+        userDocument.get().then((doc) => {
+            let goalCounter = 0;
+            if(doc.data().goals){
+                for (const goal of doc.data().goals) {
+                    console.log("GOAL RECORD")
+                    console.log("------------")
+                    goalId = goalCounter;
+                    console.log("DOC ID: " + goalId);
+                    goalTitle = goal.goal;
+                    console.log("GOAL NAME: " + goal);
+                    measure = goal.measure;
+                    console.log("MEASURE: " + measure);
+                    relevant = goal.relevant;
+                    console.log('RELEVANT: ' + relevant);
+                    timeBound = goal.time;
+                    console.log('TIME-BOUND: ' + timeBound);
+                    attainable = goal.attainable;
+                    console.log("ATTAINABLE: " + attainable);
+                    subgoals = goal.subgoals;
+                    console.log("SUB-GOALS: " + subgoals);
+                    console.log("------------------------")
+
+                    let goalsContainer = document.getElementById("goalCards");
+
+                    let column = document.createElement('div');
+                    column.setAttribute('class', 'column');
+
+                    let card = document.createElement('div');
+                    card.setAttribute('class', 'card');
+                    let cardHeader = document.createTextNode(goalTitle);
+                    card.appendChild(cardHeader);
+
+                    let measurePrgh = document.createElement('p');
+                    // bolding the label
+                    let measureLabel = document.createElement('b');
+                    let measureLabelTxt = document.createTextNode('Measure: ')
+                    measureLabel.appendChild(measureLabelTxt);
+                    measurePrgh.appendChild(measureLabel);
+                    let measureContentTxt = document.createTextNode(measure);
+                    measurePrgh.appendChild(measureContentTxt);
+                    card.appendChild(measurePrgh);
+
+                    // attainable
+                    let attainablePrgh = document.createElement('p');
+                    // bolding the label
+                    let attainableLabel = document.createElement('b');
+                    let attainableLabelTxt = document.createTextNode('Attainable: ')
+                    attainableLabel.appendChild(attainableLabelTxt);
+                    attainablePrgh.appendChild(attainableLabel);
+                    let attainableContentTxt = document.createTextNode(attainable);
+                    attainablePrgh.appendChild(attainableContentTxt);
+                    card.appendChild(attainablePrgh);
+
+                    
+                    // relevant
+                    let relevantPrgh = document.createElement('p');
+                    // bolding the label
+                    let relevantLabel = document.createElement('b');
+                    let relevantLabelTxt = document.createTextNode('Relevant: ')
+                    relevantLabel.appendChild(relevantLabelTxt);
+                    relevantPrgh.appendChild(relevantLabel);
+                    let relevantContentTxt = document.createTextNode(relevant);
+                    relevantPrgh.appendChild(relevantContentTxt);
+                    card.appendChild(relevantPrgh);
+
+                    
+                    // time bound
+                    let timeBoundPrgh = document.createElement('p');
+                    // bolding the label
+                    let timeBoundLabel = document.createElement('b');
+                    let timeBoundLabelTxt = document.createTextNode('Time Bound: ')
+                    timeBoundLabel.appendChild(timeBoundLabelTxt);
+                    timeBoundPrgh.appendChild(timeBoundLabel);
+                    let timeBoundContentTxt = document.createTextNode(timeBound);
+                    timeBoundPrgh.appendChild(timeBoundContentTxt);
+                    card.appendChild(timeBoundPrgh);
+
+                    let horizontalRuler = document.createElement('hr');
+                    card.appendChild(horizontalRuler);
+
+                    // checkbox part of the goal cards
+                    let fieldset = document.createElement('fieldset');
+                    fieldset.setAttribute('class', 'checkboxgroup')
+
+                    // pull out the array for subgoals (checkboxes) and cycle through to print each one
+                    if(subgoals){
+                        let subGoalCounter = 0;
+                        for (const subgoal of subgoals) {
+                            let input = document.createElement('input');
+                            input.setAttribute('type','checkbox');
+                            input.setAttribute('name', 'subGoal' + subGoalCounter);
+                            input.setAttribute('onclick', 'flipCheck("' + goalId + '", ' + subGoalCounter + ');')
+                            // to ensure that admins cannot check the box 
+                            input.disabled = (parent.userRole == "mentor");
+                            // for checkbox status based on true/false in db
+                            input.checked = subgoal.selected;
+                            fieldset.appendChild(input);
+
+                            let inputLabel = document.createElement('label');
+                            inputLabel.setAttribute('for', 'subGoal' + subGoalCounter);
+                            let inputLabelTxt = document.createTextNode(subgoal.label);
+                            inputLabel.appendChild(inputLabelTxt);
+                            fieldset.appendChild(inputLabel);
+                            
+                            let lineBreak1 = document.createElement('br');
+                            fieldset.appendChild(lineBreak1);
+
+                            let lineBreak2 = document.createElement('br');
+                            fieldset.appendChild(lineBreak2);
+                            subGoalCounter = subGoalCounter + 1;
+                        }
+                    }
+                    let subGoalAddinput = document.createElement('input');
+                    subGoalAddinput.setAttribute('id', goalId);
+                    subGoalAddinput.setAttribute('type','text');
+                    subGoalAddinput.setAttribute('placeholder', 'Enter Sub-Goal');
+                    fieldset.appendChild(subGoalAddinput);
+
+                    let subGoalAddinputButton = document.createElement('button');
+                    subGoalAddinputButton.style = "width:fit-content";
+                    subGoalAddinputButton.setAttribute('onclick', 'addSubGoal(document.getElementById("' + goalId + '").value, "' + goalId + '");')
+                    let subGoalAddinputButtonTxt = document.createTextNode("+");
+                    subGoalAddinputButton.appendChild(subGoalAddinputButtonTxt);
+                    fieldset.appendChild(subGoalAddinputButton);
+
+                    
+
+                    card.appendChild(fieldset);
+
+                    column.appendChild(card);
+                    goalsContainer.appendChild(column);
+                }
+            }
+        });
+        
     }
     else {
         console.log("USER IS SIGNED OUT, REDIRECTING TO LOGIN PAGE...");
@@ -77,30 +214,35 @@ function addSubGoal(subGoalText, goalId){
         label: subGoalText,
         selected: false
     }
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            let userDocument = db.collection("user_info").doc(user.uid);
+                userDocument.get().then((doc) => {
+                // Check if there is an existing array for sub-goals
+                let goalArray = null;
+                goalArray = doc.data().goals;
+                singleGoal = doc.data().goals[goalId];
+            
+                console.log(singleGoal.subgoals);
+                if(!singleGoal.subgoals){
+                    // If no, create a new array in the document. 
+                    goalArray.subgoals = [];
+                }
+                console.log(singleGoal.subgoals);
+                // Append the subgoal to the new array and leave the goal unchecked.
+                singleGoal.subgoals.push(subGoal);
 
-    let goalDocument = db.collection("goals").doc(goalId);
+                goalArray[goalId] = singleGoal;
 
-    // Check if there is an existing array for sub-goals
-    goalDocument.get().then((doc) => {
-        let subGoalArray = null;
-        subGoalArray = doc.data().subgoals;
-    
-        console.log(subGoalArray);
-        if(!subGoalArray){
-            // If no, create a new array in the document. 
-            subGoalArray = [];
+                // Update the subGoalArray in the DB
+                userDocument.update({
+                    goals: goalArray
+                })
+                .then(() => {
+                    location.reload();
+                })
+            });
         }
-        console.log(subGoalArray);
-        // Append the subgoal to the new array and leave the goal unchecked.
-        subGoalArray.push(subGoal);
-
-        // Update the subGoalArray in the DB
-        goalDocument.update({
-            subgoals: subGoalArray
-        })
-        .then(() => {
-            location.reload();
-        })
     });
 
     
@@ -112,168 +254,36 @@ function flipCheck(goalidFC, subgoalnumber){
     console.log("GOAL ID: " + goalidFC);
     console.log("SUB-GOAL NUMBER: " + subgoalnumber);
     console.log("--------------------")
-    let goalDocument = db.collection("goals").doc(goalidFC);
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            let userDocument = db.collection("user_info").doc(user.uid);
+            userDocument.get().then((doc) => {
 
-    // Check if there is an existing array for sub-goals
-    goalDocument.get().then((doc) => {
-        let subGoalArray = null;
-        subGoalArray = doc.data().subgoals;
-    
-        console.log(subGoalArray);
-        subGoalArray[subgoalnumber].selected = !subGoalArray[subgoalnumber].selected;
-        console.log(subGoalArray);
+                // Check if there is an existing array for sub-goals
+                let goalArray = null;
+                goalArray = doc.data().goals;
+                singleGoal = doc.data().goals[goalidFC];
+                subGoalArray = singleGoal.subgoals;
+            
+                console.log(subGoalArray);
+                subGoalArray[subgoalnumber].selected = !subGoalArray[subgoalnumber].selected;
+                console.log(subGoalArray);
 
-        // Update the subGoalArray in the DB
-        goalDocument.update({
-            subgoals: subGoalArray
-        })
-        .then(() => {
-            location.reload();
-        })
-    });
+                singleGoal.subgoals = subGoalArray;
+                goalArray[goalidFC] = singleGoal;
 
-    
+                // Update the subGoalArray in the DB
+                goalDocument.update({
+                    goals: goalArray
+                })
+                .then(() => {
+                    location.reload();
+                })
+            });
+        }    
+    });        
 }
-
-db.collection("goals").get().then((querySnapshot) => {
-    querySnapshot.forEach((doc) => {
-        console.log("GOAL RECORD")
-        console.log("------------")
-        goalId = doc.id;
-        console.log("DOC ID: " + goalId);
-        goal = doc.get("goal")
-        console.log("GOAL NAME: " + goal);
-        measure = doc.get("measure"); 
-        console.log("MEASURE: " + measure);
-        relevant = doc.get("relevant");
-        console.log('RELEVANT: ' + relevant);
-        timeBound = doc.get("time");
-        console.log('TIME-BOUND: ' + timeBound);
-        attainable = doc.get("attainable");
-        console.log("ATTAINABLE: " + attainable);
-        subgoals = doc.get("subgoals");
-        console.log("SUB-GOALS: " + subgoals);
-        console.log("------------------------")
-
-        let goalsContainer = document.getElementById("goalCards");
-
-        let column = document.createElement('div');
-        column.setAttribute('class', 'column');
-
-        let card = document.createElement('div');
-        card.setAttribute('class', 'card');
-        let cardHeader = document.createTextNode(goal);
-        card.appendChild(cardHeader);
-
-        let measurePrgh = document.createElement('p');
-        // bolding the label
-        let measureLabel = document.createElement('b');
-        let measureLabelTxt = document.createTextNode('Measure: ')
-        measureLabel.appendChild(measureLabelTxt);
-        measurePrgh.appendChild(measureLabel);
-        let measureContentTxt = document.createTextNode(measure);
-        measurePrgh.appendChild(measureContentTxt);
-        card.appendChild(measurePrgh);
-
-        // attainable
-        let attainablePrgh = document.createElement('p');
-        // bolding the label
-        let attainableLabel = document.createElement('b');
-        let attainableLabelTxt = document.createTextNode('Attainable: ')
-        attainableLabel.appendChild(attainableLabelTxt);
-        attainablePrgh.appendChild(attainableLabel);
-        let attainableContentTxt = document.createTextNode(attainable);
-        attainablePrgh.appendChild(attainableContentTxt);
-        card.appendChild(attainablePrgh);
-
-        
-        // relevant
-        let relevantPrgh = document.createElement('p');
-        // bolding the label
-        let relevantLabel = document.createElement('b');
-        let relevantLabelTxt = document.createTextNode('Relevant: ')
-        relevantLabel.appendChild(relevantLabelTxt);
-        relevantPrgh.appendChild(relevantLabel);
-        let relevantContentTxt = document.createTextNode(relevant);
-        relevantPrgh.appendChild(relevantContentTxt);
-        card.appendChild(relevantPrgh);
-
-        
-        // time bound
-        let timeBoundPrgh = document.createElement('p');
-        // bolding the label
-        let timeBoundLabel = document.createElement('b');
-        let timeBoundLabelTxt = document.createTextNode('Time Bound: ')
-        timeBoundLabel.appendChild(timeBoundLabelTxt);
-        timeBoundPrgh.appendChild(timeBoundLabel);
-        let timeBoundContentTxt = document.createTextNode(timeBound);
-        timeBoundPrgh.appendChild(timeBoundContentTxt);
-        card.appendChild(timeBoundPrgh);
-
-        let horizontalRuler = document.createElement('hr');
-        card.appendChild(horizontalRuler);
-
-        // checkbox part of the goal cards
-        let fieldset = document.createElement('fieldset');
-        fieldset.setAttribute('class', 'checkboxgroup')
-
-        // pull out the array for subgoals (checkboxes) and cycle through to print each one
-        if(subgoals){
-            let subGoalCounter = 0;
-            for (const subgoal of subgoals) {
-                let input = document.createElement('input');
-                input.setAttribute('type','checkbox');
-                input.setAttribute('name', 'subGoal' + subGoalCounter);
-                input.setAttribute('onclick', 'flipCheck("' + goalId + '", ' + subGoalCounter + ');')
-                // to ensure that admins cannot check the box 
-                input.disabled = (parent.userRole == "mentor");
-                // for checkbox status based on true/false in db
-                input.checked = subgoal.selected;
-                fieldset.appendChild(input);
-
-                let inputLabel = document.createElement('label');
-                inputLabel.setAttribute('for', 'subGoal' + subGoalCounter);
-                let inputLabelTxt = document.createTextNode(subgoal.label);
-                inputLabel.appendChild(inputLabelTxt);
-                fieldset.appendChild(inputLabel);
-                
-                let lineBreak1 = document.createElement('br');
-                fieldset.appendChild(lineBreak1);
-
-                let lineBreak2 = document.createElement('br');
-                fieldset.appendChild(lineBreak2);
-                subGoalCounter = subGoalCounter + 1;
-            }
-        }
-        let subGoalAddinput = document.createElement('input');
-        subGoalAddinput.setAttribute('id', goalId);
-        subGoalAddinput.setAttribute('type','text');
-        subGoalAddinput.setAttribute('placeholder', 'Enter Sub-Goal');
-        fieldset.appendChild(subGoalAddinput);
-
-        let subGoalAddinputButton = document.createElement('button');
-        subGoalAddinputButton.style = "width:fit-content";
-        subGoalAddinputButton.setAttribute('onclick', 'addSubGoal(document.getElementById("' + goalId + '").value, "' + goalId + '");')
-        let subGoalAddinputButtonTxt = document.createTextNode("+");
-        subGoalAddinputButton.appendChild(subGoalAddinputButtonTxt);
-        fieldset.appendChild(subGoalAddinputButton);
-
-        
-
-        card.appendChild(fieldset);
-
-        column.appendChild(card);
-        goalsContainer.appendChild(column);
-    });
-});
-   
-
-
-
-
-    
-    
-        
+  
     </script>
 
 

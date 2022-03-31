@@ -40,6 +40,7 @@
                 var userEmail = user.email;
                 console.log(userEmail);
                 
+                // TO-DO: Make this call pull a single document instead of multiple
                 db.collection("user_info").get().then((querySnapshot) => {
                     querySnapshot.forEach((doc) => {
                         if (doc.get("email") == userEmail) {
@@ -67,32 +68,50 @@
             console.log("ADDING GOAL");
 
             app.auth().onAuthStateChanged((user) => {
-                if (user) {
-                    console.log("For: " + user.email)
-                    db.collection("goals").add({
+                // Construct our goal
+                let goal = {
                         goal: addGoal,
                         measure: addMeasure,
                         attainable: addAttainable,
                         relevant: addRelevant,
-                        time: addTime,
-                        username: user.email
-                    })
-        
-                    .then((docRef) => {
-                        console.log("Document written with ID: ", docRef.id);
+                        time: addTime
+                    }
+                if (user) {
+                    console.log("For: " + user.email)
+                    console.log("UID : " + user.uid);
+                    let userDocument = db.collection("user_info").doc(user.uid);
+
+                    // Check if there is an existing array for sub-goals
+                    userDocument.get().then((doc) => {
+                        let goalArray = null;
+                        console.log(doc.data());
+                        goalArray = doc.data().goals;
+                    
+                        console.log(goalArray);
+                        if(!goalArray){
+                            // If no, create a new array in the document. 
+                            goalArray = [];
+                        }
+                        console.log(goalArray);
+                        // Append the subgoal to the new array and leave the goal unchecked.
+                        goalArray.push(goal);
+
+                        // Update the goalArray in the DB
+                        userDocument.update({
+                            goals: goalArray
+                        })
+                        .then(() => {
                         document.getElementById('goal').value = null;
                         document.getElementById('measure').value = null;
                         document.getElementById('attainable').value = null;
                         document.getElementById('relevant').value = null;
                         document.getElementById('time').value = null;
                         console.log('added to database');
-                    })
-                    .catch((error) => {
-                        console.error("Error adding document: " + error);
-                        // let errorMsgDisplay = document.getElementById("errorMsg");
-                        // let errorMsgText = document.createTextNode("Error Adding Review. See Console for More Details.");
-                        // errorMsgDisplay.appendChild(errorMsgText);
+                        })
+                        
                     });
+        
+                    
                 }
             });
             
