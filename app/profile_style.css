@@ -9,10 +9,6 @@ table {
     border-radius: 5px; 
     
 } 
-.card {
-    min-width: max-content; 
-    
-}
 #goalCards.row {
     width: 1000px; 
     margin-left: auto;
