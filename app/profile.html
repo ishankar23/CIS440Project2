@@ -55,10 +55,12 @@ firebase.auth().onAuthStateChanged((user) => {
             role = doc.get("role");
             phoneNumber = doc.get("phone");
             profileLink = doc.get("profile"); 
+            bio = doc.get("bio"); 
             document.getElementById("mentorName").innerHTML=fName +" "+lName;
             document.getElementById("phoneNumber").href="tel:" + phoneNumber; 
             document.getElementById("linkedEmail").href="mailto:" + userEmail; 
             document.getElementById("profileLink").href=profileLink;
+            document.getElementById("biography").innerHTML= bio; 
             // if (doc.get("email") == userEmail && doc.get("role") == "Mentor") {
             if (doc.get("role") == "Mentor") {
                 document.getElementById("menteeButton").style.visibility = "visible";
@@ -324,12 +326,19 @@ function flipCheck(subGoalId){
             <img width="125px" height="125px" src="https://t4.ftcdn.net/jpg/02/36/01/13/240_F_236011345_3W03mLyEwnqy7NmLPjRAkIRJWxMu9Rp3.jpg">
         </td>
     </tr>
-  
+    
+    <tr>
+        <td colspan=4>
+        <p id="biography"></p>
+        </td>
+    </tr>
     
 
    
 </table>
 </div>
+
+
 <br>
 <br>
 <br>

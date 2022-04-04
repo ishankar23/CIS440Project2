@@ -51,10 +51,12 @@
             console.log(doc.data().firstName);
             if (doc.data().firstName.length !== 0 || doc.data().lastName.length !== 0)
             {
+                if(doc.data().role == "Mentee") {
                 var ul = document.getElementById("menteeList");
                 var li = document.createElement("li");
                 li.appendChild(document.createTextNode(doc.data().firstName + " " + doc.data().lastName));
                 ul.appendChild(li)
+                }
             }
         });
         });
