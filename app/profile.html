@@ -35,8 +35,13 @@ const db = firebase.firestore();
 
 console.log("INITIALIZED FIREBASE");
 
+
+
 let parent = this;
 let userRole = null;
+
+
+
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
     
@@ -44,8 +49,8 @@ firebase.auth().onAuthStateChanged((user) => {
         var userEmail = user.email; 
         console.log(uid); 
         console.log(userEmail);
-        // document.getElementById("goalButton").style.visibility = "hidden"; 
-        // document.getElementById("menteeButton").style.visibility = "hidden";
+        document.getElementById("goalButton").style.visibility = "hidden"; 
+        document.getElementById("menteeButton").style.visibility = "hidden";
         
         var userInfoDoc = db.collection("user_info").doc(uid);
 
