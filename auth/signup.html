@@ -32,7 +32,7 @@
     const db = app.firestore();
 
     // Create the User Sign Up Function
-    function userSignUp(email, password, firstName, lastName, phone, profile){
+    function userSignUp(email, password, firstName, lastName, phone, profile, bio){
         app.auth().createUserWithEmailAndPassword(email, password)
         .then((UserCreds) => {
             console.log(UserCreds);
@@ -42,7 +42,8 @@
                 role: 'Mentee', 
                 email: email, 
                 phone: phone, 
-                profile: profile
+                profile: profile,
+                bio: bio
             })
             .then(() => {
                 console.log("USER ACCOUNT CREATED")
@@ -72,12 +73,13 @@
         <input type='text' name='firstName' id='firstName' class='loginFormField' placeholder="First Name"><br>
         <input type='text' name='lastName' id='lastName' class='loginFormField' placeholder="Last Name"><br>
         <input type='number' name='phone' id='phone' class='loginFormField' placeholder="Phone"><br>
-        <input type='text' name='profile' id='profile' class='loginFormField' placeholder="LinkedIn Profile"><br><br>
-        
+        <input type='text' name='profile' id='profile' class='loginFormField' placeholder="LinkedIn Profile"><br>
+        <textarea type='text' name='bio' id='bio' class='loginFormField' placeholder="Tell us about yourself!"></textarea><br><br>
+
         <b>Login Details</b><br>
         <input type="email" name="email" id="emailField" class="loginFormField" pattern="[a-z0-9.-_]+@[a-z]+\.[a-z]{2,3}" placeholder="E-Mail"><br>
         <input type="password" name="password" id="password" class="loginFormField" placeholder="Password"><br><br>
-        <button id="submit" onclick="userSignUp(document.getElementById('emailField').value, document.getElementById('password').value, document.getElementById('firstName').value, document.getElementById('lastName').value, document.getElementById('phone').value, document.getElementById('profile').value)">Sign Up</button>
+        <button id="submit" onclick="userSignUp(document.getElementById('emailField').value, document.getElementById('password').value, document.getElementById('firstName').value, document.getElementById('lastName').value, document.getElementById('phone').value, document.getElementById('profile').value, document.getElementById('bio').value)">Sign Up</button>
       
       </main>
 

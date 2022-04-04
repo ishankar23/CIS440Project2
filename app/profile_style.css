@@ -7,8 +7,14 @@ table {
     margin-right: auto; 
     border: solid gray 1px;
     border-radius: 5px; 
+    text-align: center;
     
 } 
+#biography {
+    margin: auto; 
+    text-align: center;
+    
+}
 #goalCards.row {
     width: 1000px; 
     margin-left: auto;
