@@ -127,3 +127,11 @@ body {
     }
 
   }
+
+  #editButtonId {
+    margin-top: 1em; 
+  }
+
+  #doneButtonId {
+    margin-top: 1em; 
+  }
