@@ -25,6 +25,7 @@ table {
 }
 .center {
     margin: auto; 
+    background-color: #FFFDF2;
 }
 
 img {
@@ -54,7 +55,8 @@ button {
     height: 30px; 
     font-size: 18px; 
     border-radius: 5px; 
-    border: solid gray 1px; 
+    border: #7BC2BC 1px; 
+    background-color: #7BC2BC;
 }
 
 /* h1 {
