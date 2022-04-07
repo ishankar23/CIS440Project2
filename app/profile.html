@@ -104,8 +104,10 @@ firebase.auth().onAuthStateChanged((user) => {
 
                 let card = document.createElement('div');
                 card.setAttribute('class', 'card');
-                let cardHeader = document.createTextNode(goal);
-                card.appendChild(cardHeader);
+                let cardHeaderPrgh = document.createElement('p');
+                let cardHeaderTxt = document.createTextNode(goal);
+                cardHeaderPrgh.appendChild(cardHeaderTxt);
+                card.appendChild(cardHeaderPrgh);
 
                 let measurePrgh = document.createElement('p');
                 // bolding the label
@@ -238,14 +240,54 @@ firebase.auth().onAuthStateChanged((user) => {
                 subGoalAddinputButton.appendChild(subGoalAddinputButtonTxt);
                 fieldset.appendChild(subGoalAddinputButton);
 
-                
-
                 card.appendChild(fieldset);
+
+                let editButton = document.createElement('button');
+                editButton.setAttribute('id', 'editButtonId');
+                editButton.addEventListener("click", function() {
+                    cardHeaderPrgh.contentEditable = true;
+                    cardHeaderPrgh.style.backgroundColor = "white";
+                    measurePrgh.contentEditable = true;
+                    measurePrgh.style.backgroundColor = "white";
+                    attainablePrgh.contentEditable = true; 
+                    attainablePrgh.style.backgroundColor = "white";
+                    relevantPrgh.contentEditable = true; 
+                    relevantPrgh.style.backgroundColor = "white";
+                    timeBoundPrgh.contentEditable = true; 
+                    timeBoundPrgh.style.backgroundColor = "white";
+                    editButton.style.visibility = "hidden"
+                    doneButton.style.visibility = "visible"
+                })
+                let editButtonTxt = document.createTextNode("Edit");
+                editButton.appendChild(editButtonTxt);
+                card.appendChild(editButton);
+
+                let doneButton = document.createElement('button'); 
+                doneButton.setAttribute('id', 'doneButtonId'); 
+                doneButton.addEventListener("click", function(){
+                    cardHeaderPrgh.contentEditable = false;
+                    cardHeaderPrgh.style.backgroundColor = "lightgray";
+                    measurePrgh.contentEditable = false;
+                    measurePrgh.style.backgroundColor = "lightgray";
+                    attainablePrgh.contentEditable = false; 
+                    attainablePrgh.style.backgroundColor = "lightgray";
+                    relevantPrgh.contentEditable = false; 
+                    relevantPrgh.style.backgroundColor = "lightgray";
+                    timeBoundPrgh.contentEditable = false; 
+                    timeBoundPrgh.style.backgroundColor = "lightgray";
+                    editButton.style.visibility = "visible"
+                    doneButton.style.visibility = "hidden"
+                })
+                let doneButtonTxt = document.createTextNode("Submit");
+                doneButton.style.visibility = "hidden";
+                doneButton.appendChild(doneButtonTxt);
+                card.appendChild(doneButton);
 
                 column.appendChild(card);
                 goalsContainer.appendChild(column);
             });
         });
+
     }
     else {
         console.log("USER IS SIGNED OUT, REDIRECTING TO LOGIN PAGE...");
