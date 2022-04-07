@@ -54,6 +54,7 @@ firebase.auth().onAuthStateChanged((user) => {
         
         var userInfoDoc = db.collection("user_info").doc(uid);
 
+        // display user information
         userInfoDoc.get().then((doc) => {
             fName = doc.get("firstName"); 
             lName = doc.get("lastName");
