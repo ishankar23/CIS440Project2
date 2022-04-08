@@ -84,6 +84,7 @@ firebase.auth().onAuthStateChanged((user) => {
                 console.log("GOAL RECORD")
                 console.log("------------")
                 goalId = doc.id;
+                editGoalId = doc.id;
                 console.log("DOC ID: " + goalId);
                 goal = doc.get("goal")
                 console.log("GOAL NAME: " + goal);
@@ -101,20 +102,28 @@ firebase.auth().onAuthStateChanged((user) => {
 
                 let column = document.createElement('div');
                 column.setAttribute('class', 'column');
-
+                
                 let card = document.createElement('div');
                 card.setAttribute('class', 'card');
+
+                let cardHeaderLabel = document.createElement('p');
+                cardHeaderLabel.setAttribute('class', 'goalLabel');
+                let cardHeaderLabelTxt = document.createTextNode("Goal: ");
+                cardHeaderLabel.appendChild(cardHeaderLabelTxt);
+                card.appendChild(cardHeaderLabel);
                 let cardHeaderPrgh = document.createElement('p');
                 let cardHeaderTxt = document.createTextNode(goal);
                 cardHeaderPrgh.appendChild(cardHeaderTxt);
                 card.appendChild(cardHeaderPrgh);
-
-                let measurePrgh = document.createElement('p');
+                
                 // bolding the label
-                let measureLabel = document.createElement('b');
+                let measureLabel = document.createElement('p');
+                measureLabel.setAttribute('class', 'goalLabel');
                 let measureLabelTxt = document.createTextNode('Measure: ')
                 measureLabel.appendChild(measureLabelTxt);
-                measurePrgh.appendChild(measureLabel);
+                card.appendChild(measureLabel);
+                // measurePrgh.appendChild(measureLabel);
+                let measurePrgh = document.createElement('p');
                 let measureContentTxt = document.createTextNode(measure);
                 measurePrgh.appendChild(measureContentTxt);
                 card.appendChild(measurePrgh);
@@ -122,10 +131,12 @@ firebase.auth().onAuthStateChanged((user) => {
                 // attainable
                 let attainablePrgh = document.createElement('p');
                 // bolding the label
-                let attainableLabel = document.createElement('b');
+                let attainableLabel = document.createElement('p');
+                attainableLabel.setAttribute('class', 'goalLabel');
                 let attainableLabelTxt = document.createTextNode('Attainable: ')
                 attainableLabel.appendChild(attainableLabelTxt);
-                attainablePrgh.appendChild(attainableLabel);
+                card.appendChild(attainableLabel);
+                // attainablePrgh.appendChild(attainableLabel);
                 let attainableContentTxt = document.createTextNode(attainable);
                 attainablePrgh.appendChild(attainableContentTxt);
                 card.appendChild(attainablePrgh);
@@ -134,10 +145,12 @@ firebase.auth().onAuthStateChanged((user) => {
                 // relevant
                 let relevantPrgh = document.createElement('p');
                 // bolding the label
-                let relevantLabel = document.createElement('b');
+                let relevantLabel = document.createElement('p');
+                relevantLabel.setAttribute('class', 'goalLabel');
                 let relevantLabelTxt = document.createTextNode('Relevant: ')
                 relevantLabel.appendChild(relevantLabelTxt);
-                relevantPrgh.appendChild(relevantLabel);
+                card.appendChild(relevantLabel);
+                // relevantPrgh.appendChild(relevantLabel);
                 let relevantContentTxt = document.createTextNode(relevant);
                 relevantPrgh.appendChild(relevantContentTxt);
                 card.appendChild(relevantPrgh);
@@ -146,10 +159,12 @@ firebase.auth().onAuthStateChanged((user) => {
                 // time bound
                 let timeBoundPrgh = document.createElement('p');
                 // bolding the label
-                let timeBoundLabel = document.createElement('b');
+                let timeBoundLabel = document.createElement('p');
+                timeBoundLabel.setAttribute('class', 'goalLabel');
                 let timeBoundLabelTxt = document.createTextNode('Time Bound: ')
                 timeBoundLabel.appendChild(timeBoundLabelTxt);
-                timeBoundPrgh.appendChild(timeBoundLabel);
+                card.appendChild(timeBoundLabel);
+                // timeBoundPrgh.appendChild(timeBoundLabel);
                 let timeBoundContentTxt = document.createTextNode(timeBound);
                 timeBoundPrgh.appendChild(timeBoundContentTxt);
                 card.appendChild(timeBoundPrgh);
@@ -277,6 +292,15 @@ firebase.auth().onAuthStateChanged((user) => {
                     timeBoundPrgh.style.backgroundColor = "lightgray";
                     editButton.style.visibility = "visible"
                     doneButton.style.visibility = "hidden"
+                    console.log("Editing goal: " + doc.id)
+                    //update the goal in the db
+                    db.collection("goals").doc(doc.id).update({
+                        "header": cardHeaderPrgh.innerHTML,
+                        "measure": measurePrgh.innerHTML,
+                        "attainable": attainablePrgh.innerHTML,
+                        "relevant": relevantPrgh.innerHTML,
+                        "time": timeBoundPrgh.innerHTML
+                    });
                 })
                 let doneButtonTxt = document.createTextNode("Submit");
                 doneButton.style.visibility = "hidden";
