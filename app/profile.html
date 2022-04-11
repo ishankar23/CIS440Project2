@@ -39,7 +39,7 @@ console.log("INITIALIZED FIREBASE");
 
 let parent = this;
 let userRole = null;
-
+let goalUserId;
 
 
 firebase.auth().onAuthStateChanged((user) => {
@@ -52,8 +52,28 @@ firebase.auth().onAuthStateChanged((user) => {
         document.getElementById("goalButton").style.visibility = "hidden"; 
         document.getElementById("menteeButton").style.visibility = "hidden";
         
-        var userInfoDoc = db.collection("user_info").doc(uid);
 
+        //get pid from query param (google how to get this using vanilla js)
+        const urlParams = new URLSearchParams(window.location.search);
+        console.log(urlParams)
+        const pid = urlParams.get('pid');
+        console.log(pid)
+
+        //if else statemet
+        //if there is a querry param then look for pid
+        if(pid)
+        {
+            var userInfoDoc = db.collection("user_info").doc(pid);
+            goalUserId = pid
+            
+        }
+        else
+        //else use uid
+        {
+            var userInfoDoc = db.collection("user_info").doc(uid);
+            goalUserId = uid
+        }
+        
         // display user information
         userInfoDoc.get().then((doc) => {
             fName = doc.get("firstName"); 
@@ -68,18 +88,21 @@ firebase.auth().onAuthStateChanged((user) => {
             document.getElementById("profileLink").href=profileLink;
             document.getElementById("biography").innerHTML= bio; 
             // if (doc.get("email") == userEmail && doc.get("role") == "Mentor") {
-            if (doc.get("role") == "Mentor") {
-                document.getElementById("menteeButton").style.visibility = "visible";
-            }
-            
-            // if (doc.get("email") == userEmail && doc.get("role") == "Mentee") {
-            if (doc.get("role") == "Mentee") {
-                document.getElementById("goalButton").style.visibility = "visible";
+                if (doc.get("role") == "Mentor") {
+                    document.getElementById("menteeButton").style.visibility = "visible";
+                    
+                }
+                
+                // if (doc.get("email") == userEmail && doc.get("role") == "Mentee") {
+                    if (doc.get("role") == "Mentee") {
+                        document.getElementById("goalButton").style.visibility = "visible";
                     
             }     
         });
+
+
         
-        db.collection("goals").where('UID', '==', uid).get().then((querySnapshot) => {
+        db.collection("goals").where('UID', '==', goalUserId).get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 console.log("GOAL RECORD")
                 console.log("------------")
@@ -306,6 +329,18 @@ firebase.auth().onAuthStateChanged((user) => {
                 doneButton.style.visibility = "hidden";
                 doneButton.appendChild(doneButtonTxt);
                 card.appendChild(doneButton);
+
+                //add input box
+                let comments = document.createElement("textarea");
+                comments.placeholder = "Mentor Comments";
+                comments.id = "mentorComments";
+                card.appendChild(comments);
+                //cerate button
+                let commentButton = document.createElement('button');
+                let commentButtonTxt = document.createTextNode("Submit Comment");
+                commentButton.appendChild(commentButtonTxt);
+                card.appendChild(commentButton);
+
 
                 column.appendChild(card);
                 goalsContainer.appendChild(column);

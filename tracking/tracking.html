@@ -54,7 +54,10 @@
                 if(doc.data().role == "Mentee") {
                 var ul = document.getElementById("menteeList");
                 var li = document.createElement("li");
-                li.appendChild(document.createTextNode(doc.data().firstName + " " + doc.data().lastName));
+                var link = document.createElement('a');
+                    link.href = "../app/profile.html?pid=" + doc.id;
+                    link.innerText = doc.data().firstName + " " + doc.data().lastName;
+                li.appendChild(link);
                 ul.appendChild(li)
                 }
             }
