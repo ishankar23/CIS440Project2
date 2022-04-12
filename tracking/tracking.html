@@ -46,28 +46,27 @@
         var group = []
         database.collection("user_info").get().then((querySnapshot) =>
         {
-            querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
-            console.log(doc.id, " => ", doc.data());
-            console.log(doc.data().firstName);
-            if (doc.data().firstName.length !== 0 || doc.data().lastName.length !== 0)
-            {
-                if(doc.data().role == "Mentee") {
-                    for (let i = 0; i<4; i++) { 
+                querySnapshot.forEach((doc) => {
+                // doc.data() is never undefined for query doc snapshots
+                console.log(doc.id, " => ", doc.data());
+                console.log(doc.data().firstName);
+                if (doc.data().firstName.length !== 0 || doc.data().lastName.length !== 0)
+                {
+                    if(doc.data().role == "Mentee") {
                         var ul = document.getElementById("menteeList");
-                        // group.push(ul);
-                        // console.log(group);
+                        console.log(ul);
+                        
+                        var li = document.createElement("li");
+                        var link = document.createElement('a');
+                        link.href = "../app/profile.html?pid=" + doc.id;
+                        link.innerText = doc.data().firstName + " " + doc.data().lastName;
+                        li.appendChild(link);
+                        ul.appendChild(li)
+                        
                     }
-                    var li = document.createElement("li");
-                    var link = document.createElement('a');
-                    link.href = "../app/profile.html?pid=" + doc.id;
-                    link.innerText = doc.data().firstName + " " + doc.data().lastName;
-                    li.appendChild(link);
-                    ul.appendChild(li)
-                    
                 }
-            }
-        });
+            });
+           // }
         });
     }
     loadList()
