@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="../app/profile_style.css">
     <title>Home</title>
     <!-- DATABASE CONNECTION DON'T TOUCH -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -43,6 +43,7 @@
     var database = firebase.firestore(app);
 
     function loadList(){
+        var group = []
         database.collection("user_info").get().then((querySnapshot) =>
         {
             querySnapshot.forEach((doc) => {
@@ -52,13 +53,18 @@
             if (doc.data().firstName.length !== 0 || doc.data().lastName.length !== 0)
             {
                 if(doc.data().role == "Mentee") {
-                var ul = document.getElementById("menteeList");
-                var li = document.createElement("li");
-                var link = document.createElement('a');
+                    for (let i = 0; i<4; i++) { 
+                        var ul = document.getElementById("menteeList");
+                        // group.push(ul);
+                        // console.log(group);
+                    }
+                    var li = document.createElement("li");
+                    var link = document.createElement('a');
                     link.href = "../app/profile.html?pid=" + doc.id;
                     link.innerText = doc.data().firstName + " " + doc.data().lastName;
-                li.appendChild(link);
-                ul.appendChild(li)
+                    li.appendChild(link);
+                    ul.appendChild(li)
+                    
                 }
             }
         });
