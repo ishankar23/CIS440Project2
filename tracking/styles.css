@@ -16,3 +16,11 @@ button
     border-radius: 5px; 
     border: solid gray 1px; 
 }
+
+ul {
+    list-style-type: none;
+}
+
+.profileButton {
+    margin-bottom: 1em;
+}

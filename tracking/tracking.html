@@ -54,10 +54,13 @@
                 if(doc.data().role == "Mentee") {
                 var ul = document.getElementById("menteeList");
                 var li = document.createElement("li");
+                var profielButton = document.createElement("button");
+                profielButton.setAttribute("class", "profileButton")
                 var link = document.createElement('a');
-                    link.href = "../app/profile.html?pid=" + doc.id;
+                    link.href = "../app/profile.html?pid=" + doc.id ;
                     link.innerText = doc.data().firstName + " " + doc.data().lastName;
-                li.appendChild(link);
+                profielButton.appendChild(link)
+                li.appendChild(profielButton);
                 ul.appendChild(li)
                 }
             }

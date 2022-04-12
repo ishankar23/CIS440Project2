@@ -137,8 +137,9 @@ body {
   }
 
   .goalLabel {
-    font-size: 16px; 
-    font-weight: bold; 
+    font-size: 16px;  
+    font-weight: bold;
+    font-style: italic;
     margin: 0em; 
     padding: 0em;
     white-space: nowrap;
