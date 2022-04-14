@@ -325,16 +325,26 @@ firebase.auth().onAuthStateChanged((user) => {
                 card.appendChild(doneButton);
 
                 //add input box
-                let comments = document.createElement("textarea");
+                let comments = document.createElement("input");
+                comments.setAttribute("type", "text")
+                comments.setAttribute("id", "mentorComments")
                 comments.placeholder = "Mentor Comments";
                 comments.id = "mentorComments";
                 card.appendChild(comments);
+
                 //cerate button
                 let commentButton = document.createElement('button');
+                commentButton.addEventListener("click", function() {
+                    //update comments in the db 
+                    console.log(comments.value)
+                    db.collection("goals").doc(doc.id).update({
+                        "comments": comments.value
+                    })
+                })
+
                 let commentButtonTxt = document.createTextNode("Submit Comment");
                 commentButton.appendChild(commentButtonTxt);
                 card.appendChild(commentButton);
-
 
                 column.appendChild(card);
                 goalsContainer.appendChild(column);

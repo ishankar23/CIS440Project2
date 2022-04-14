@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../app/profile_style.css">
+    <link rel="stylesheet" href="./styles.css">
     <title>Home</title>
     <!-- DATABASE CONNECTION DON'T TOUCH -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -58,9 +59,12 @@
                         
                         var li = document.createElement("li");
                         var link = document.createElement('a');
+                        var menteeButton = document.createElement("button")
+                        menteeButton.setAttribute("id", "menteeButton")
                         link.href = "../app/profile.html?pid=" + doc.id;
                         link.innerText = doc.data().firstName + " " + doc.data().lastName;
-                        li.appendChild(link);
+                        menteeButton.appendChild(link);
+                        li.appendChild(menteeButton);
                         ul.appendChild(li)
                         
                     }
