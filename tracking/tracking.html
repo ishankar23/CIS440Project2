@@ -15,13 +15,20 @@
 </head>  
 <body>
 
-  <h1 id="mentee-header">My Mentees</h1>
-  <div>
-      <ul id="menteeList"> 
-          
-      </ul>
-  </div>
-  <button><a href="../app/profile.html">Back to My Profile</a></button>
+    <h1 id="mentee-header">My Mentees</h1>
+    <div>
+        <ul id="userMenteeList">
+            
+        </ul>
+    </div>
+
+    <h1 id="mentee-header">Available Mentees</h1>
+    <div>
+        <ul id="availableMenteeList">
+            
+        </ul>
+    </div>
+    <button><a href="../app/profile.html">Back to My Profile</a></button>
       
 
 </body>
@@ -41,40 +48,80 @@
     };
     //Initating Database Connection -- DO NOT REMOVE
     const app = firebase.initializeApp(firebaseConfig);
-    var database = firebase.firestore(app);
+    var db = firebase.firestore(app);
+
+    app.auth().onAuthStateChanged((user) => {
+        if (user) {
+            // User is signed in, see docs for a list of available properties
+            // https://firebase.google.com/docs/reference/js/firebase.User
+            console.log("USER SIGNED IN AS : " + user.uid);           
+        } //end if statement for user sign in 
+        else {
+            console.log("USER IS SIGNED OUT, REDIRECTING TO LOGIN PAGE...");
+            window.location.href = "../auth/login.html"
+            // User is signed out
+            // ...
+        }
+    });
 
     function loadList(){
         var group = []
-        database.collection("user_info").get().then((querySnapshot) =>
+        db.collection("user_info").where("role", "==", "Mentee").get().then((querySnapshot) =>
         {
-                querySnapshot.forEach((doc) => {
-                // doc.data() is never undefined for query doc snapshots
+            querySnapshot.forEach((doc) => {
                 console.log(doc.id, " => ", doc.data());
-                console.log(doc.data().firstName);
-                if (doc.data().firstName.length !== 0 || doc.data().lastName.length !== 0)
-                {
-                    if(doc.data().role == "Mentee") {
-                        var ul = document.getElementById("menteeList");
-                        console.log(ul);
-                        
-                        var li = document.createElement("li");
-                        var link = document.createElement('a');
-                        var menteeButton = document.createElement("button")
-                        menteeButton.setAttribute("id", "menteeButton")
-                        link.href = "../app/profile.html?pid=" + doc.id;
-                        link.innerText = doc.data().firstName + " " + doc.data().lastName;
-                        menteeButton.appendChild(link);
-                        li.appendChild(menteeButton);
-                        ul.appendChild(li)
-                        
-                    }
+
+                var ul = document.getElementById("availableMenteeList");
+                if(!doc.data().UID || doc.data().UID == ""){
+                    var li = document.createElement("li");
+                    var link = document.createElement('a');
+                    link.href = "../app/profile.html?pid=" + doc.id;
+                    link.innerText = doc.data().firstName + " " + doc.data().lastName;
+                    li.appendChild(link);
+                    
+                    var addButton = document.createElement("button");
+                    addButton.innerText = "Add"
+                    addButton.style = "margin-left: 15px;margin-top: 10px;width: fit-content;font-size: 14px;"
+                    addButton.setAttribute("onclick", 'addUserToMenteeList("' + doc.id + '");')
+                    li.appendChild(addButton);
+                    
+                    ul.appendChild(li);
                 }
             });
-           // }
+        });
+        app.auth().onAuthStateChanged((user) => {
+            db.collection("user_info").where("UID", "==", user.uid).get().then((querySnapshot) =>
+            {
+                querySnapshot.forEach((doc) => {
+                    console.log(doc.id, " => ", doc.data());
+                    var ul2 = document.getElementById("userMenteeList");
+                    var li2 = document.createElement("li");
+                    var link2 = document.createElement('a');
+                    link2.href = "../app/profile.html?pid=" + doc.id;
+                    link2.innerText = doc.data().firstName + " " + doc.data().lastName;
+                    li2.appendChild(link2);
+                    
+                    ul2.appendChild(li2);
+                });
+            // }
+            });
+        });
+    }
+
+    function addUserToMenteeList(menteeUID) {
+        app.auth().onAuthStateChanged((user) => {
+            // User is signed in, see docs for a list of available properties
+            // https://firebase.google.com/docs/reference/js/firebase.User
+            console.log("USER SIGNED IN AS : " + user.uid);  
+            db.collection("user_info").doc(menteeUID).update({
+                UID: user.uid
+            })
+            .then(() => {
+                location.reload();
+            })
         });
     }
     loadList()
-
 
     //***Waiting for Authentication in order to Implement Full***
     // Initialize Firebase

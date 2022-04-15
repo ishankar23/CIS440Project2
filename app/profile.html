@@ -60,19 +60,15 @@ firebase.auth().onAuthStateChanged((user) => {
 
         //if else statemet
         //if there is a querry param then look for pid
-        if(pid)
-        {
-            var userInfoDoc = db.collection("user_info").doc(pid);
+        if(pid){
             goalUserId = pid
             document.getElementById("profileButton").style.visibility = "visible";
         }
-        else
-        //else use uid
-        {
-            var userInfoDoc = db.collection("user_info").doc(uid);
+        else{
             goalUserId = uid
         }
         
+        var userInfoDoc = db.collection("user_info").doc(goalUserId);
         // display user information
         userInfoDoc.get().then((doc) => {
             fName = doc.get("firstName"); 
@@ -80,22 +76,24 @@ firebase.auth().onAuthStateChanged((user) => {
             role = doc.get("role");
             phoneNumber = doc.get("phone");
             profileLink = doc.get("profile"); 
-            bio = doc.get("bio"); 
-            document.getElementById("mentorName").innerHTML=fName +" "+lName;
+            bio = doc.get("bio");
+            mentorUID = doc.get("UID")
+            document.getElementById("userDisplayName").innerHTML=fName +" "+lName;
             document.getElementById("phoneNumber").href="tel:" + phoneNumber; 
             document.getElementById("linkedEmail").href="mailto:" + userEmail; 
             document.getElementById("profileLink").href=profileLink;
             document.getElementById("biography").innerHTML= bio; 
-            // if (doc.get("email") == userEmail && doc.get("role") == "Mentor") {
-                if (doc.get("role") == "Mentor") {
-                    document.getElementById("menteeButton").style.visibility = "visible";
-                    
+            if (doc.get("role") == "Mentor") {
+                document.getElementById("menteeButton").style.visibility = "visible";
+            }
+            if (doc.get("role") == "Mentee") {
+                document.getElementById("goalButton").style.visibility = "visible";
+                if(mentorUID){
+                    db.collection("user_info").doc(mentorUID).get().then((doc2) => {
+                        var mentorNameHolder = document.getElementById("mentorName");
+                        mentorNameHolder.innerHTML="Your Mentor is: " + doc2.get("firstName");
+                    });
                 }
-                
-                // if (doc.get("email") == userEmail && doc.get("role") == "Mentee") {
-                    if (doc.get("role") == "Mentee") {
-                        document.getElementById("goalButton").style.visibility = "visible";
-                    
             }     
         });
 
@@ -407,7 +405,12 @@ function flipCheck(subGoalId){
 
 <table id="contactInfo" class="center">
   
-    <th class="center" id="mentorName" colspan="3"></th>
+    <tr>
+        <th class="center" id="userDisplayName" colspan="3"></th>
+    </tr>
+    <tr>
+        <th class="center" id="mentorName" colspan="3" style="font-size: medium;"></th>
+    </tr>
     <tr>
         <address>
         <td class="attribute"><a id="phoneNumber" href="tel:1234567890"><img src="https://img.icons8.com/ios-filled/30/000000/phone.png"/></a></td>
