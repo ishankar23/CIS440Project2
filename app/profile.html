@@ -35,8 +35,6 @@ const db = firebase.firestore();
 
 console.log("INITIALIZED FIREBASE");
 
-
-
 let parent = this;
 let userRole = null;
 let goalUserId;
@@ -51,6 +49,7 @@ firebase.auth().onAuthStateChanged((user) => {
         console.log(userEmail);
         document.getElementById("goalButton").style.visibility = "hidden"; 
         document.getElementById("menteeButton").style.visibility = "hidden";
+        document.getElementById("profileButton").style.visibility = "hidden";
         
 
         //get pid from query param (google how to get this using vanilla js)
@@ -63,6 +62,7 @@ firebase.auth().onAuthStateChanged((user) => {
         //if there is a querry param then look for pid
         if(pid){
             goalUserId = pid
+            document.getElementById("profileButton").style.visibility = "visible";
         }
         else{
             goalUserId = uid
@@ -97,8 +97,6 @@ firebase.auth().onAuthStateChanged((user) => {
             }     
         });
 
-
-        
         db.collection("goals").where('UID', '==', goalUserId).get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 console.log("GOAL RECORD")
@@ -258,9 +256,6 @@ firebase.auth().onAuthStateChanged((user) => {
                     
                 });
 
-                
-                
-
                 let subGoalAddinput = document.createElement('input');
                 subGoalAddinput.setAttribute('id', goalId);
                 subGoalAddinput.setAttribute('type','text');
@@ -328,16 +323,26 @@ firebase.auth().onAuthStateChanged((user) => {
                 card.appendChild(doneButton);
 
                 //add input box
-                let comments = document.createElement("textarea");
+                let comments = document.createElement("input");
+                comments.setAttribute("type", "text")
+                comments.setAttribute("id", "mentorComments")
                 comments.placeholder = "Mentor Comments";
                 comments.id = "mentorComments";
                 card.appendChild(comments);
+
                 //cerate button
                 let commentButton = document.createElement('button');
+                commentButton.addEventListener("click", function() {
+                    //update comments in the db 
+                    console.log(comments.value)
+                    db.collection("goals").doc(doc.id).update({
+                        "comments": comments.value
+                    })
+                })
+
                 let commentButtonTxt = document.createTextNode("Submit Comment");
                 commentButton.appendChild(commentButtonTxt);
                 card.appendChild(commentButton);
-
 
                 column.appendChild(card);
                 goalsContainer.appendChild(column);
@@ -392,11 +397,7 @@ function flipCheck(subGoalId){
 }   
     </script>
 
-
-
-
 </head>
-
 
 <body>
 
@@ -425,10 +426,15 @@ function flipCheck(subGoalId){
         </td>
     </tr>
         <!-- TO DO: Profile page needs to be role aware to show & hide My Mentees Button -->
-    <tr id="menteeButton">
+    <tr class="center" id="menteeButton">
         <td colspan="3">
             <button><a href="../tracking/tracking.html">My Mentees</a></button>
             <button><a href="../auth/login.html">Logout</a></button>
+        </td>
+    </tr>
+    <tr class="center" id="profileButton">
+        <td colspan="3">
+            <button><a href="../app/profile.html">Back to My Profile</a></button>
         </td>
     </tr>
 
@@ -437,15 +443,12 @@ function flipCheck(subGoalId){
             <img width="125px" height="125px" src="https://t4.ftcdn.net/jpg/02/36/01/13/240_F_236011345_3W03mLyEwnqy7NmLPjRAkIRJWxMu9Rp3.jpg">
         </td>
     </tr>
-    
+
     <tr>
         <td colspan=4>
         <p id="biography"></p>
         </td>
     </tr>
-    
-
-   
 </table>
 </div>
 

@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../app/profile_style.css">
+    <link rel="stylesheet" href="./styles.css">
     <title>Home</title>
     <!-- DATABASE CONNECTION DON'T TOUCH -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -69,6 +70,7 @@
         {
             querySnapshot.forEach((doc) => {
                 console.log(doc.id, " => ", doc.data());
+
                 var ul = document.getElementById("availableMenteeList");
                 if(!doc.data().UID || doc.data().UID == ""){
                     var li = document.createElement("li");
@@ -86,7 +88,6 @@
                     ul.appendChild(li);
                 }
             });
-           // }
         });
         app.auth().onAuthStateChanged((user) => {
             db.collection("user_info").where("UID", "==", user.uid).get().then((querySnapshot) =>

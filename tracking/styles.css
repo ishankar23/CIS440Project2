@@ -15,4 +15,18 @@ button
     font-size: 18px; 
     border-radius: 5px; 
     border: solid gray 1px; 
+    margin-bottom: 1em;
+}
+
+li {
+    list-style-type: none;
+}
+
+a {
+    text-decoration: none;
+    color: #000000;
+}
+
+a:visited {
+    color: #000000;
 }
