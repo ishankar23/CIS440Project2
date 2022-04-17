@@ -11,13 +11,46 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
+    
 </head>  
-<body>
+<body onload="loadEverything()">
+    <div id="loader"></div>
+
+    <div id="myModal" class="modal">
+
+        
+        <div class="modal-content">
+          <span class="close">&times;</span>
+
+          <div>
+            <label for="goal2">Specific Goal: </label>
+            <p><input type="text" name="goal2" id="goal2"></p>
+            <label for="measure2">Measure</label></p>
+            <p><input type="text" name="measure2" id="measure2"></p>
+            <label for="attainable2">Attainable</label>
+            <p><input type="text" name="attainable2" id="attainable2"></p>
+            <label for="relevant2">Relevant</label>
+            <p><input type="text" name="relevant2" id="relevant2"></p>
+            <label for="time2">Time Bound</label>
+            <p><input type="date" name="time2" id="time2"></p>
+            <br><br><button type="button" name="addGoalButton" 
+            id="addGoalButton" onclick="addMenteeGoal(document.getElementById('goal2').value, 
+            document.getElementById('measure2').value, document.getElementById('attainable2').value, document.getElementById('relevant2').value,
+            document.getElementById('time2').value)">Add Goal</button>
+        </div>
+
+
+        </div>
+      
+      </div>
+
+
+
+
 
 
     <h1 id="mentee-header">My Mentees</h1>
-    <div>
+    <div id="menteeListDiv" style="display:none;">
         <ul id="userMenteeList">
             
         </ul>
@@ -33,7 +66,7 @@
 
       
 
-</body>
+
 <script>
     console.log("STARTING DB CONNECTION");
     // TODO: Add SDKs for Firebase products that you want to use
@@ -65,6 +98,9 @@
             // ...
         }
     });
+
+    var currentMenteeUID = "";
+
 
     function loadList(){
         var group = []
@@ -103,12 +139,127 @@
                     link2.innerText = doc.data().firstName + " " + doc.data().lastName;
                     li2.appendChild(link2);
                     
+                    var addGoalButton = document.createElement("button");
+                    addGoalButton.innerText = "Add Goal for this Mentee";
+                    addGoalButton.style = "margin-left: 15px;margin-top: 10px;width: fit-content;font-size: 14px;"
+                    addGoalButton.setAttribute("class", "addGoalForMentee");
+                    addGoalButton.setAttribute("id", doc.id)
+                    li2.appendChild(addGoalButton);
+
+
+
+
                     ul2.appendChild(li2);
                 });
             // }
             });
         });
+
+
+
+        
+        
+
+
+        
+
+
+
+        
+
+
+
+
+
+
+
     }
+
+    
+
+        var modal = document.getElementById("myModal");
+        var btns = document.getElementsByClassName("addGoalForMentee");
+
+        function executeButtons() {
+            // Get the button that opens the modal
+            // console.log(btns.length);
+            // console.log(btns.length)
+        
+            console.log("Hiiiii");
+            console.log(btns);
+            console.log(btns.length);
+            for(let btnIndex = 0; btnIndex < btns.length; btnIndex++) {
+
+            console.log("hellooooo i am in the for looppppppp")
+            btns[btnIndex].onclick = function() {
+                console.log(btns[btnIndex].id)
+                modal.style.display = "block"; 
+                currentMenteeUID = btns[btnIndex].id;
+                console.log(currentMenteeUID)
+                }
+            }
+            
+
+
+        
+            // Get the <span> element that closes the modal
+            var span = document.getElementsByClassName("close")[0];
+
+            
+
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function() {
+            modal.style.display = "none";
+            }
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                }
+            }
+
+
+    }
+
+
+    function addMenteeGoal(addGoal, addMeasure, addAttainable, addRelevant, addTime) {
+
+            console.log("ADDING GOAL");
+
+            
+                    
+                    db.collection("goals").add({
+                        goal: addGoal,
+                        measure: addMeasure,
+                        attainable: addAttainable,
+                        relevant: addRelevant,
+                        time: addTime,
+                        UID: currentMenteeUID
+                    })
+        
+                    .then((docRef) => {
+                        console.log("Document written with ID: ", docRef.id);
+                        document.getElementById('goal2').value = null;
+                        document.getElementById('measure2').value = null;
+                        document.getElementById('attainable2').value = null;
+                        document.getElementById('relevant2').value = null;
+                        document.getElementById('time2').value = null;
+                        console.log('added to database');
+                        window.alert("Goal has been successfully added!")
+                        modal.style.display = "none";
+                    })
+                    .catch((error) => {
+                        console.error("Error adding document: " + error);
+                        // let errorMsgDisplay = document.getElementById("errorMsg");
+                        // let errorMsgText = document.createTextNode("Error Adding Review. See Console for More Details.");
+                        // errorMsgDisplay.appendChild(errorMsgText);
+                    });
+               
+            
+        }
+
+
 
     function addUserToMenteeList(menteeUID) {
         app.auth().onAuthStateChanged((user) => {
@@ -124,7 +275,9 @@
         });
     }
     loadList()
-
+    
+    const myTimeout = setTimeout(executeButtons, 2000);
+  
     //***Waiting for Authentication in order to Implement Full***
     // Initialize Firebase
     // console.log("INITIALIZED FIREBASE");
@@ -144,4 +297,17 @@
 
     // Function to GET list of all Mentors Mentees
     </script>
+    <script>
+        var myVar;
+        
+        function loadEverything() {
+          myVar = setTimeout(showPage, 2000);
+        }
+        
+        function showPage() {
+          document.getElementById("loader").style.display = "none";
+          document.getElementById("menteeListDiv").style.display = "block";
+        }
+        </script>
+    </body>
 </html>
