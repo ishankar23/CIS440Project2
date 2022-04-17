@@ -127,3 +127,19 @@ body {
     }
 
   }
+
+  #editButtonId {
+    margin-top: 1em; 
+  }
+
+  #doneButtonId {
+    margin-top: 1em; 
+  }
+
+  .goalLabel {
+    font-size: 16px; 
+    font-weight: bold; 
+    margin: 0em; 
+    padding: 0em;
+    white-space: nowrap;
+  }
