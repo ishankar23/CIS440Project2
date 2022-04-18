@@ -298,17 +298,6 @@ firebase.auth().onAuthStateChanged((user) => {
                             let progressCalculation = subGoalCompleted/subGoalCounter
                             progressBar.setAttribute("value", progressCalculation); 
                             fieldset.appendChild(progressBar);
-                            
-                            
-                               
-                            
-
-
-
-                           
-
-
-
 
                         });
                     }
@@ -351,6 +340,22 @@ firebase.auth().onAuthStateChanged((user) => {
                 let editButtonTxt = document.createTextNode("Edit");
                 editButton.appendChild(editButtonTxt);
                 card.appendChild(editButton);
+
+                let deleteButton = document.createElement('button');
+                deleteButton.setAttribute('id', 'deleteButtonId');
+                deleteButton.addEventListener("click", function() {
+                    db.collection("goals").doc(goalId).delete().then(()=> {
+                        console.log("Document successfully deleted!");
+                        card.remove();
+                    }).catch((error) => {
+                        console.error("Error removing document: ", error);
+                    });
+                    });
+            
+
+                let deleteButtonTxt = document.createTextNode("Delete");
+                deleteButton.appendChild(deleteButtonTxt);
+                card.appendChild(deleteButton);
 
                 let doneButton = document.createElement('button'); 
                 doneButton.setAttribute('id', 'doneButtonId'); 

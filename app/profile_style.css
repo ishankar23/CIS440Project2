@@ -128,7 +128,7 @@ body {
 
   }
 
-  #editButtonId {
+  #editButtonId, #deleteButtonId {
     margin-top: 1em; 
   }
 
