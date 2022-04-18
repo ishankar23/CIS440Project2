@@ -49,16 +49,8 @@ firebase.auth().onAuthStateChanged((user) => {
         console.log(userEmail);
         document.getElementById("goalButton").style.visibility = "hidden"; 
         document.getElementById("menteeButton").style.visibility = "hidden";
-
-        document.getElementById("refreshButton").style.display = "none";
-     
-     
-    
-        var userInfoDoc = db.collection("user_info").doc(uid);
-
         document.getElementById("profileButton").style.visibility = "hidden";
         
-
 
         //get pid from query param (google how to get this using vanilla js)
         const urlParams = new URLSearchParams(window.location.search);
@@ -68,15 +60,19 @@ firebase.auth().onAuthStateChanged((user) => {
 
         //if else statemet
         //if there is a querry param then look for pid
-        if(pid){
+        if(pid)
+        {
+            var userInfoDoc = db.collection("user_info").doc(pid);
             goalUserId = pid
             document.getElementById("profileButton").style.visibility = "visible";
         }
-        else{
+        else
+        //else use uid
+        {
+            var userInfoDoc = db.collection("user_info").doc(uid);
             goalUserId = uid
         }
         
-        var userInfoDoc = db.collection("user_info").doc(goalUserId);
         // display user information
         userInfoDoc.get().then((doc) => {
             fName = doc.get("firstName"); 
@@ -84,38 +80,26 @@ firebase.auth().onAuthStateChanged((user) => {
             role = doc.get("role");
             phoneNumber = doc.get("phone");
             profileLink = doc.get("profile"); 
-            bio = doc.get("bio");
-            mentorUID = doc.get("UID")
-            document.getElementById("userDisplayName").innerHTML=fName +" "+lName;
+            bio = doc.get("bio"); 
+            document.getElementById("mentorName").innerHTML=fName +" "+lName;
             document.getElementById("phoneNumber").href="tel:" + phoneNumber; 
             document.getElementById("linkedEmail").href="mailto:" + userEmail; 
             document.getElementById("profileLink").href=profileLink;
-            document.getElementById("biography").innerHTML= bio;
-            
-           
-            if (doc.get("role") == "Mentor") {
-                document.getElementById("menteeButton").style.visibility = "visible";
-            }
-            if (doc.get("role") == "Mentee") {
-                document.getElementById("goalButton").style.visibility = "visible";
-                if(mentorUID){
-                    db.collection("user_info").doc(mentorUID).get().then((doc2) => {
-                        var mentorNameHolder = document.getElementById("mentorName");
-                        mentorNameHolder.innerHTML="Your Mentor is: " + doc2.get("firstName");
-                    });
+            document.getElementById("biography").innerHTML= bio; 
+            // if (doc.get("email") == userEmail && doc.get("role") == "Mentor") {
+                if (doc.get("role") == "Mentor") {
+                    document.getElementById("menteeButton").style.visibility = "visible";
+                    
                 }
+                
+                // if (doc.get("email") == userEmail && doc.get("role") == "Mentee") {
+                    if (doc.get("role") == "Mentee") {
+                        document.getElementById("goalButton").style.visibility = "visible";
+                    
             }     
         });
 
-        let goalCounter = 0; 
-        let subGoalTotal = 0;
-        let subGoalChecked = 0;
-        
-        // db.collection("goals").where('UID', '==', uid).get().then((querySnapshot) => {
-
-
         db.collection("goals").where('UID', '==', goalUserId).get().then((querySnapshot) => {
-
             querySnapshot.forEach((doc) => {
                 console.log("GOAL RECORD")
                 console.log("------------")
@@ -132,13 +116,6 @@ firebase.auth().onAuthStateChanged((user) => {
                 console.log('TIME-BOUND: ' + timeBound);
                 attainable = doc.get("attainable");
                 console.log("ATTAINABLE: " + attainable);
-                
-                
-                
-                goalCounter += 1;
-                // goalArray.push(doc);
-                // console.log(goalArray);
-                console.log("NUMBER OF GOALS: "+ goalCounter)
                 console.log("------------------------")
 
                 let goalsContainer = document.getElementById("goalCards");
@@ -218,12 +195,10 @@ firebase.auth().onAuthStateChanged((user) => {
                 // checkbox part of the goal cards
                 let fieldset = document.createElement('fieldset');
                 fieldset.setAttribute('class', 'checkboxgroup')
-                
+
                 // pull out the array for subgoals (checkboxes) and cycle through to print each one
                 db.collection("subgoals").where('UID', '==', goalId).get().then((querySnapshot) => {
                     querySnapshot.forEach((doc2) => {
-                        subGoalTotal += 1;
-                        
                         console.log("SUB-GOAL RECORD")
                         console.log("------------")
                         let subgoaluid = doc2.id;
@@ -267,26 +242,6 @@ firebase.auth().onAuthStateChanged((user) => {
                         db.collection("subgoals").where('UID', '==', querySnapshot.docs[0].data().UID).where("checked", "==", true).get().then((querySnapshot2) => {
                             // console.log(querySnapshot2);
                             subGoalCompleted = querySnapshot2.size;
-                            subGoalChecked += subGoalCompleted;
-
-
-                            
-                            if(subGoalChecked/subGoalTotal == 1) {
-                                
-                                
-                                userInfoDoc.update({
-                                    "role": "Mentor"
-                                });
-                                
-                                console.log(userInfoDoc.get("role"))
-                                document.getElementById("refreshButton").style.display = "inline";
-                                document.getElementById("refreshButton").innerHTML = "Upgrade to Mentor";
-                                
-                                
-
-                            }
-
-                            
                             let progressBar = document.createElement("progress");
                             progressBar.setAttribute("max", 1);
                             console.log("SUBGOAL COUNTER")
@@ -298,12 +253,10 @@ firebase.auth().onAuthStateChanged((user) => {
                             let progressCalculation = subGoalCompleted/subGoalCounter
                             progressBar.setAttribute("value", progressCalculation); 
                             fieldset.appendChild(progressBar);
-
                         });
                     }
                     
                 });
-
 
                 let subGoalAddinput = document.createElement('input');
                 subGoalAddinput.setAttribute('id', goalId);
@@ -341,22 +294,6 @@ firebase.auth().onAuthStateChanged((user) => {
                 editButton.appendChild(editButtonTxt);
                 card.appendChild(editButton);
 
-                let deleteButton = document.createElement('button');
-                deleteButton.setAttribute('id', 'deleteButtonId');
-                deleteButton.addEventListener("click", function() {
-                    db.collection("goals").doc(goalId).delete().then(()=> {
-                        console.log("Document successfully deleted!");
-                        card.remove();
-                    }).catch((error) => {
-                        console.error("Error removing document: ", error);
-                    });
-                    });
-            
-
-                let deleteButtonTxt = document.createTextNode("Delete");
-                deleteButton.appendChild(deleteButtonTxt);
-                card.appendChild(deleteButton);
-
                 let doneButton = document.createElement('button'); 
                 doneButton.setAttribute('id', 'doneButtonId'); 
                 doneButton.addEventListener("click", function(){
@@ -389,44 +326,51 @@ firebase.auth().onAuthStateChanged((user) => {
 
                 //add input box
                 let comments = document.createElement("input");
+                comments.setAttribute('id', goalId);
                 comments.setAttribute("type", "text")
-                comments.setAttribute("id", "mentorComments")
                 comments.placeholder = "Mentor Comments";
-                comments.id = "mentorComments";
                 card.appendChild(comments);
 
-                //cerate button
+                //create button
                 let commentButton = document.createElement('button');
-                commentButton.addEventListener("click", function() {
-                    //update comments in the db 
-                    console.log(comments.value)
-                    db.collection("goals").doc(doc.id).update({
-                        "comments": comments.value
-                    })
-                })
+                commentButton.addEventListener("click", () => addComment(comments.value, comments.id))
 
                 let commentButtonTxt = document.createTextNode("Submit Comment");
                 commentButton.appendChild(commentButtonTxt);
                 card.appendChild(commentButton);
 
+                db.collection("comments").where('GID', '==', goalId).get().then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        console.log("Comment RECORD")
+                        console.log("------------")
+                        // goalId = doc.id;
+                        console.log( doc.get("text"));
+                        // var commentItem = document.createElement('p')
+                        // commentItem.textContent("afd")
+                        let paragraph = document.createElement("p");
+                        let paraString = 'Comment: ' + doc.get("text")
+    
+                        paragraph.textContent = paraString;
+                        card.appendChild(paragraph)
+                    });
+                    
+                });
+
                 column.appendChild(card);
                 goalsContainer.appendChild(column);
+            
+            
+            
             });
-
-            
-            
-            
         });
 
     }
-    
     else {
         console.log("USER IS SIGNED OUT, REDIRECTING TO LOGIN PAGE...");
         window.location.href = "../auth/login.html"
         // User is signed out
         // ...
     }
-    
 });
 
 function addSubGoal(subGoalText, goalId){
@@ -440,6 +384,23 @@ function addSubGoal(subGoalText, goalId){
         label: subGoalText,
         checked: false,
         UID: goalId
+    })
+    .then(() => {
+        location.reload();
+    })
+    
+}
+
+function addComment(commentText, goalId){
+    console.log("NEW comment RECORD")
+    console.log("------------")
+    console.log("Comment TEXT: " + commentText);
+    console.log("GOAL ID: " + goalId);
+    console.log("------------------------")
+    // Construct the subgoal dictionary
+    db.collection("comments").add({
+        text: commentText,
+        GID: goalId,
     })
     .then(() => {
         location.reload();
@@ -466,20 +427,6 @@ function flipCheck(subGoalId){
         })
     });
 }   
-
-
-    
-function refreshPage() {
-
-    window.alert("Congratulations! Check out your new mentor profile."); 
-    location.reload();
-    
-}
-
-            
-            
-           
-
     </script>
 
 </head>
@@ -490,12 +437,7 @@ function refreshPage() {
 
 <table id="contactInfo" class="center">
   
-    <tr>
-        <th class="center" id="userDisplayName" colspan="3"></th>
-    </tr>
-    <tr>
-        <th class="center" id="mentorName" colspan="3" style="font-size: medium;"></th>
-    </tr>
+    <th class="center" id="mentorName" colspan="3"></th>
     <tr>
         <address>
         <td class="attribute"><a id="phoneNumber" href="tel:1234567890"><img src="https://img.icons8.com/ios-filled/30/000000/phone.png"/></a></td>
@@ -508,7 +450,6 @@ function refreshPage() {
         <td colspan="3">
             <button><a href="./index.html">Add Goals</a></button>
             <button><a href="../auth/login.html">Logout</a></button>
-            <button id="refreshButton" onclick=refreshPage()></button>
         </td>
     </tr>
         <!-- TO DO: Profile page needs to be role aware to show & hide My Mentees Button -->
@@ -526,7 +467,7 @@ function refreshPage() {
 
     <tr class="center"> 
         <td class="center" colspan=3>
-            <img width="125px" height="125px" src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png">
+            <img width="125px" height="125px" src="https://t4.ftcdn.net/jpg/02/36/01/13/240_F_236011345_3W03mLyEwnqy7NmLPjRAkIRJWxMu9Rp3.jpg">
         </td>
     </tr>
 
@@ -593,6 +534,7 @@ function refreshPage() {
         </fieldset>
     </div>
   </div> -->
+
 
 
 </body>
