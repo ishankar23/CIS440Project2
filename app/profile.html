@@ -49,6 +49,7 @@ firebase.auth().onAuthStateChanged((user) => {
         console.log(userEmail);
         document.getElementById("goalButton").style.visibility = "hidden"; 
         document.getElementById("menteeButton").style.visibility = "hidden";
+        document.getElementById("refreshButton").style.display = "none";
         document.getElementById("profileButton").style.visibility = "hidden";
         
 
@@ -105,6 +106,10 @@ firebase.auth().onAuthStateChanged((user) => {
             }     
         });
 
+        let goalCounter = 0;
+        let subGoalTotal = 0;
+        let subGoalChecked = 0; 
+
         db.collection("goals").where('UID', '==', goalUserId).get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 console.log("GOAL RECORD")
@@ -122,6 +127,8 @@ firebase.auth().onAuthStateChanged((user) => {
                 console.log('TIME-BOUND: ' + timeBound);
                 attainable = doc.get("attainable");
                 console.log("ATTAINABLE: " + attainable);
+                goalCounter += 1;
+                console.log("NUMBER OF GOALS: "+ goalCounter)
                 console.log("------------------------")
 
                 let goalsContainer = document.getElementById("goalCards");
@@ -205,6 +212,7 @@ firebase.auth().onAuthStateChanged((user) => {
                 // pull out the array for subgoals (checkboxes) and cycle through to print each one
                 db.collection("subgoals").where('UID', '==', goalId).get().then((querySnapshot) => {
                     querySnapshot.forEach((doc2) => {
+                        subGoalTotal += 1;
                         console.log("SUB-GOAL RECORD")
                         console.log("------------")
                         let subgoaluid = doc2.id;
@@ -248,6 +256,15 @@ firebase.auth().onAuthStateChanged((user) => {
                         db.collection("subgoals").where('UID', '==', querySnapshot.docs[0].data().UID).where("checked", "==", true).get().then((querySnapshot2) => {
                             // console.log(querySnapshot2);
                             subGoalCompleted = querySnapshot2.size;
+                            subGoalChecked += subGoalCompleted; 
+                            if(subGoalChecked/subGoalTotal == 1) {
+                                userInfoDoc.update({
+                                    "role": "Mentor"
+                                });
+                                console.log(userInfoDoc.get("role"));
+                                document.getElementById("refreshButton").style.display = "inline";
+                                document.getElementById("refreshButton").innerHTML = "Upgrade to Mentor";
+                            }
                             let progressBar = document.createElement("progress");
                             progressBar.setAttribute("max", 1);
                             console.log("SUBGOAL COUNTER")
@@ -348,7 +365,7 @@ firebase.auth().onAuthStateChanged((user) => {
 
                 //add input box
                 let comments = document.createElement("input");
-                comments.setAttribute('id', goalId);
+                comments.setAttribute('id', 'goalId');
                 comments.setAttribute("type", "text")
                 comments.placeholder = "Mentor Comments";
                 card.appendChild(comments);
@@ -449,6 +466,11 @@ function flipCheck(subGoalId){
         })
     });
 }   
+
+function refreshPage(){
+    window.alert("Congratulations! Check out your new mentor profile.");
+    location.reload();
+}
     </script>
 
 </head>
@@ -476,6 +498,7 @@ function flipCheck(subGoalId){
         <td colspan="3">
             <button><a href="./index.html">Add Goals</a></button>
             <button><a href="../auth/login.html">Logout</a></button>
+            <button id="refreshButton" onclick=refreshPage()></button>
         </td>
     </tr>
         <!-- TO DO: Profile page needs to be role aware to show & hide My Mentees Button -->
@@ -493,7 +516,7 @@ function flipCheck(subGoalId){
 
     <tr class="center"> 
         <td class="center" colspan=3>
-            <img width="125px" height="125px" src="https://t4.ftcdn.net/jpg/02/36/01/13/240_F_236011345_3W03mLyEwnqy7NmLPjRAkIRJWxMu9Rp3.jpg">
+            <img width="125px" height="125px" src="https://www.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png">
         </td>
     </tr>
 
