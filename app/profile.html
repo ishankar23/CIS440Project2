@@ -365,7 +365,7 @@ firebase.auth().onAuthStateChanged((user) => {
 
                 //add input box
                 let comments = document.createElement("input");
-                comments.setAttribute('id', 'goalId');
+                comments.setAttribute('id', goalId);
                 comments.setAttribute("type", "text")
                 comments.placeholder = "Mentor Comments";
                 card.appendChild(comments);
